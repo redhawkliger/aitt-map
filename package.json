@@ -1,0 +1,35 @@
+{
+  "name": "@aitt/map",
+  "version": "0.0.0",
+  "description": "Map kit for AI Transportation Tools: California basemap, Signal Flow style, layers, measure",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "public/fonts"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "basemap": "node scripts/get-basemap.mjs",
+    "test": "vitest run && playwright test",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@protomaps/basemaps": "^5.7.2",
+    "@turf/area": "^7.4.0",
+    "@turf/length": "^7.4.0",
+    "maplibre-gl": "^5.24.1",
+    "pmtiles": "^4.5.0"
+  },
+  "devDependencies": {
+    "@maplibre/maplibre-gl-style-spec": "^26.8.0",
+    "@playwright/test": "^1.65.1",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}
