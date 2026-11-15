@@ -1,0 +1,38 @@
+/* Map tokens: the Signal Flow palette applied to a map. One block per style variant.
+   night = Signal Flow dark surfaces + road/paint tokens; day = Signal Flow light; plan = near-monochrome for print.
+   Signal colours (go / amber / stop) are not used here: on a map they are kept for results that mean something. */
+:root {
+  /* night */
+  --map-night-bg:#0B0E11; --map-night-earth:#101418; --map-night-water:#0C1A24; --map-night-water-label:#5D8BA8;
+  --map-night-park:#0E1D17; --map-night-wood:#0F1A15; --map-night-scrub:#12171A; --map-night-sand:#1A1A17;
+  --map-night-school:#15171C; --map-night-hospital:#1A1517; --map-night-industrial:#13161A;
+  --map-night-pedestrian:#161B20; --map-night-aerodrome:#14181C; --map-night-runway:#22282E; --map-night-pier:#1B2127;
+  --map-night-building:#151A1F; --map-night-building-3d:#141A20; --map-night-casing:#0B0E11; --map-night-tunnel:#1B2127;
+  --map-night-road-other:#20272E; --map-night-road-minor:#2F3841; --map-night-road-link:#4A5560;
+  --map-night-road-major:#5C6875; --map-night-road-highway:#8C7A4A; --map-night-rail:#2A3138;
+  --map-night-boundary:#57636F; --map-night-label-road:#8E9AA6; --map-night-label-road-major:#C4CCD3;
+  --map-night-label-place:#A7B2BC; --map-night-label-place-major:#E6EAEE; --map-night-label-halo:#0B0E11;
+  --map-night-label-water:#5D8BA8; --map-night-poi:#8E9AA6; --map-night-poi-green:#4FA37A; --map-night-poi-blue:#6F9BD1;
+  /* day */
+  --map-day-bg:#ECEEF0; --map-day-earth:#F4F5F7; --map-day-water:#C9DCEB; --map-day-water-label:#3F6E91;
+  --map-day-park:#D8EAD9; --map-day-wood:#D2E4D3; --map-day-scrub:#E6ECE4; --map-day-sand:#EFEAD9;
+  --map-day-school:#ECE9F1; --map-day-hospital:#F3E6E8; --map-day-industrial:#E8E9EC; --map-day-pedestrian:#F0F1F3;
+  --map-day-aerodrome:#E6E8EC; --map-day-runway:#D3D8DD; --map-day-pier:#E1E4E8; --map-day-building:#DDE1E6;
+  --map-day-building-3d:#D3D8DD; --map-day-casing:#C2C9D0; --map-day-tunnel:#E4E7EA; --map-day-road-other:#FFFFFF;
+  --map-day-road-minor:#FFFFFF; --map-day-road-link:#FFFFFF; --map-day-road-major:#FFFFFF;
+  --map-day-road-highway:#F2D58A; --map-day-rail:#B3BBC3; --map-day-boundary:#8E9AA6; --map-day-label-road:#57636F;
+  --map-day-label-road-major:#2B333B; --map-day-label-place:#3A444E; --map-day-label-place-major:#13181D;
+  --map-day-label-halo:#FFFFFF; --map-day-label-water:#3F6E91; --map-day-poi:#57636F; --map-day-poi-green:#3E8A5F;
+  --map-day-poi-blue:#1F5FAD;
+  /* plan */
+  --map-plan-bg:#FFFFFF; --map-plan-earth:#FFFFFF; --map-plan-water:#E3E8ED; --map-plan-water-label:#6B7680;
+  --map-plan-park:#F1F3F1; --map-plan-wood:#F1F3F1; --map-plan-scrub:#F7F8F7; --map-plan-sand:#F7F7F4;
+  --map-plan-school:#F7F7F7; --map-plan-hospital:#F7F7F7; --map-plan-industrial:#F7F7F7; --map-plan-pedestrian:#F7F7F7;
+  --map-plan-aerodrome:#F5F5F5; --map-plan-runway:#DADDE0; --map-plan-pier:#EEEEEE; --map-plan-building:#E9EBED;
+  --map-plan-building-3d:#E9EBED; --map-plan-casing:#9AA3AB; --map-plan-tunnel:#EEEEEE; --map-plan-road-other:#FFFFFF;
+  --map-plan-road-minor:#FFFFFF; --map-plan-road-link:#FFFFFF; --map-plan-road-major:#FFFFFF;
+  --map-plan-road-highway:#FFFFFF; --map-plan-rail:#8E9AA6; --map-plan-boundary:#57636F; --map-plan-label-road:#3A444E;
+  --map-plan-label-road-major:#13181D; --map-plan-label-place:#3A444E; --map-plan-label-place-major:#13181D;
+  --map-plan-label-halo:#FFFFFF; --map-plan-label-water:#6B7680; --map-plan-poi:#6B7680; --map-plan-poi-green:#6B7680;
+  --map-plan-poi-blue:#6B7680;
+}
