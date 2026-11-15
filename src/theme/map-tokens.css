@@ -13,6 +13,8 @@
   --map-night-boundary:#57636F; --map-night-label-road:#8E9AA6; --map-night-label-road-major:#C4CCD3;
   --map-night-label-place:#A7B2BC; --map-night-label-place-major:#E6EAEE; --map-night-label-halo:#0B0E11;
   --map-night-label-water:#5D8BA8; --map-night-poi:#8E9AA6; --map-night-poi-green:#4FA37A; --map-night-poi-blue:#6F9BD1;
+  --map-night-building-3d-top:#3A4652; --map-night-glow:#C9A24A; --map-night-sky:#06080A; --map-night-haze:#1A2129;
+  --map-night-light:#E6EAEE;
   /* day */
   --map-day-bg:#ECEEF0; --map-day-earth:#F4F5F7; --map-day-water:#C9DCEB; --map-day-water-label:#3F6E91;
   --map-day-park:#D8EAD9; --map-day-wood:#D2E4D3; --map-day-scrub:#E6ECE4; --map-day-sand:#EFEAD9;
@@ -24,6 +26,8 @@
   --map-day-label-road-major:#2B333B; --map-day-label-place:#3A444E; --map-day-label-place-major:#13181D;
   --map-day-label-halo:#FFFFFF; --map-day-label-water:#3F6E91; --map-day-poi:#57636F; --map-day-poi-green:#3E8A5F;
   --map-day-poi-blue:#1F5FAD;
+  --map-day-building-3d-top:#C2C9D0; --map-day-glow:#F2D58A; --map-day-sky:#DCE6F0; --map-day-haze:#ECEEF0;
+  --map-day-light:#FFFFFF;
   /* plan */
   --map-plan-bg:#FFFFFF; --map-plan-earth:#FFFFFF; --map-plan-water:#E3E8ED; --map-plan-water-label:#6B7680;
   --map-plan-park:#F1F3F1; --map-plan-wood:#F1F3F1; --map-plan-scrub:#F7F8F7; --map-plan-sand:#F7F7F4;
@@ -35,4 +39,6 @@
   --map-plan-label-road-major:#13181D; --map-plan-label-place:#3A444E; --map-plan-label-place-major:#13181D;
   --map-plan-label-halo:#FFFFFF; --map-plan-label-water:#6B7680; --map-plan-poi:#6B7680; --map-plan-poi-green:#6B7680;
   --map-plan-poi-blue:#6B7680;
+  --map-plan-building-3d-top:#E9EBED; --map-plan-glow:#FFFFFF; --map-plan-sky:#FFFFFF; --map-plan-haze:#FFFFFF;
+  --map-plan-light:#FFFFFF;
 }

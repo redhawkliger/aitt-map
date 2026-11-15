@@ -62,6 +62,33 @@ describe('buildStyle', () => {
     for (const v of ['night', 'day']) expect(pois(v)[0].minzoom).toBeGreaterThanOrEqual(17);
   });
 
+  it('night draws a soft glow under the freeways, from a token', () => {
+    const ls = buildStyle(tokens, 'night', OPTS).layers;
+    const glow = ls.findIndex((l) => l.id === 'roads_highway_glow');
+    expect(glow).toBeGreaterThan(-1);
+    expect(glow).toBeLessThan(ls.findIndex((l) => l.id === 'roads_highway'));
+    expect(ls[glow].paint['line-blur']).toBeTruthy();
+    expect(ls[glow].paint['line-color']).toBe(tokens['--map-night-glow']);
+  });
+
+  it('night 3D buildings get lighter with height between two tokens', () => {
+    const b = buildStyle(tokens, 'night', OPTS).layers.find((l) => l.id === 'buildings_3d');
+    const colours = colorsIn(b.paint['fill-extrusion-color']);
+    expect(colours).toContain(tokens['--map-night-building-3d']);
+    expect(colours).toContain(tokens['--map-night-building-3d-top']);
+  });
+
+  it('night sets the sky and haze from tokens', () => {
+    const st = buildStyle(tokens, 'night', OPTS);
+    expect(st.sky['sky-color']).toBe(tokens['--map-night-sky']);
+    expect(st.sky['horizon-color']).toBe(tokens['--map-night-haze']);
+    expect(st.sky['fog-color']).toBe(tokens['--map-night-haze']);
+  });
+
+  it('night 3D buildings have the new style on a valid style', () => {
+    expect(validateStyleMin(buildStyle(tokens, 'night', OPTS))).toEqual([]);
+  });
+
   it('night has 3D buildings and plan does not', () => {
     const has3d = (v) => buildStyle(tokens, v, OPTS).layers.some((l) => l.type === 'fill-extrusion');
     expect(has3d('night')).toBe(true);

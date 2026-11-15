@@ -7,6 +7,7 @@ export const MAP_SLOTS = [
   'pedestrian', 'aerodrome', 'runway', 'pier', 'building', 'building-3d', 'casing', 'tunnel', 'road-other',
   'road-minor', 'road-link', 'road-major', 'road-highway', 'rail', 'boundary', 'label-road', 'label-road-major',
   'label-place', 'label-place-major', 'label-halo', 'label-water', 'poi', 'poi-green', 'poi-blue',
+  'building-3d-top', 'glow', 'sky', 'haze', 'light',
 ];
 
 // Protomaps flavor key → our slot. First match wins. An unknown key throws, so a basemaps upgrade that adds a
@@ -81,13 +82,33 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
       { ...l, maxzoom: 15 },
       { id: 'buildings_3d', type: 'fill-extrusion', source: 'basemap', 'source-layer': 'buildings', minzoom: 15,
         paint: {
-          'fill-extrusion-color': t('building-3d'),
+          // Taller is lighter, so a skyline reads at a glance.
+          'fill-extrusion-color': ['interpolate', ['linear'], ['coalesce', ['get', 'height'], 6],
+            0, t('building-3d'), 120, t('building-3d-top')],
           'fill-extrusion-height': ['coalesce', ['get', 'height'], 6],
           'fill-extrusion-base': ['coalesce', ['get', 'min_height'], 0],
           'fill-extrusion-opacity': 0.9,
         } },
     ]);
+    // A soft glow under the freeways, like light on wet asphalt.
+    const hw = ls.find((l) => l.id === 'roads_highway');
+    if (hw) {
+      const glow = {
+        id: 'roads_highway_glow', type: 'line', source: 'basemap', 'source-layer': hw['source-layer'],
+        filter: hw.filter, ...(hw.minzoom !== undefined ? { minzoom: hw.minzoom } : {}),
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': t('glow'),
+          'line-width': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 3, 12, 12, 16, 34, 20, 80],
+          'line-blur': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 2, 12, 8, 16, 24, 20, 60],
+          'line-opacity': 0.28,
+        },
+      };
+      const at = ls.findIndex((l) => l.id === 'roads_highway_casing_early' || l.id === 'roads_highway');
+      ls.splice(at, 0, glow);
+    }
   }
+  const night = variant === 'night';
   return {
     version: 8,
     name: `aitt-${variant}`,
@@ -95,5 +116,10 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
     sprite: sprite ?? `${origin}/sprites/v4/${variant === 'night' ? 'dark' : 'light'}`,
     sources: { basemap: { type: 'vector', url: basemapUrl, attribution } },
     layers: ls,
+    ...(night ? {
+      sky: { 'sky-color': t('sky'), 'horizon-color': t('haze'), 'fog-color': t('haze'),
+        'sky-horizon-blend': 0.6, 'horizon-fog-blend': 0.7, 'fog-ground-blend': 0.6 },
+      light: { anchor: 'viewport', color: t('light'), intensity: 0.35, position: [1.15, 210, 30] },
+    } : {}),
   };
 }

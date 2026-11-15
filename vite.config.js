@@ -32,4 +32,5 @@ function serveData() {
 export default defineConfig({
   plugins: [serveData()],
   build: { rollupOptions: { input: { demo: 'demo/index.html' } } },
+  test: { include: ['tests/unit/**/*.test.js'] },
 });
