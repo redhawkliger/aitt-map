@@ -31,3 +31,33 @@ test('a tap adds a point and a drag pans', async ({ page }) => {
   expect(Math.abs(after[0] - before[0]) + Math.abs(after[1] - before[1])).toBeGreaterThan(1e-5);
   expect(await points()).toBe(2);
 });
+
+test('after switching measure mode, a double-tap ends the line and does not zoom', async ({ page }) => {
+  await ready(page);
+  const vp = page.viewportSize();
+  const cx = vp.width / 2, cy = vp.height / 2;
+  await page.getByRole('button', { name: 'Distance' }).tap();
+  await page.touchscreen.tap(cx - 80, cy); await page.waitForTimeout(400);
+  await page.getByRole('button', { name: 'Area' }).tap();
+  await page.waitForTimeout(300);
+  for (const [x, y] of [[cx - 80, cy - 60], [cx + 80, cy - 60], [cx + 80, cy + 60]]) { await page.touchscreen.tap(x, y); await page.waitForTimeout(400); }
+  const z0 = await page.evaluate(() => window.__map.getZoom());
+  await page.touchscreen.tap(cx - 80, cy + 60); await page.waitForTimeout(60); await page.touchscreen.tap(cx - 80, cy + 60);
+  await page.waitForTimeout(900);
+  expect(await page.evaluate(() => window.__map.getZoom())).toBeCloseTo(z0, 2);
+  await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
+});
+
+test('measuring leaves double-tap zoom as it found it', async ({ page }) => {
+  await ready(page);
+  await page.getByRole('button', { name: 'Distance' }).tap();
+  await page.getByRole('button', { name: 'Area' }).tap();
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(100);
+  expect(await page.evaluate(() => window.__map.doubleClickZoom.isEnabled())).toBe(true);
+  await page.evaluate(() => window.__map.doubleClickZoom.disable());
+  await page.getByRole('button', { name: 'Distance' }).tap();
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(100);
+  expect(await page.evaluate(() => window.__map.doubleClickZoom.isEnabled())).toBe(false);
+});

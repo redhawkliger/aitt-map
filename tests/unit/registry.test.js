@@ -115,6 +115,22 @@ describe('layer registry', () => {
     expect(m.getStyle().layers.map((l) => l.id)).toEqual(['earth', 'naip-raster', 'labels']);
   });
 
+  it('a map layer id already used by a hidden layer is refused up front', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, photos); // hidden, so naip-raster is not on the map yet
+    const clash = { id: 'b', name: 'B', group: 'data', source: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+      layers: [{ id: 'naip-raster', type: 'circle', source: 'b' }] };
+    expect(() => addDataLayer(m, clash)).toThrow(LayerExistsError);
+    expect(listLayers(m).map((l) => l.id)).toEqual(['naip']);
+  });
+
+  it('a layer whose source fails to add is not left half-registered', () => {
+    const m = fakeMap(base('night'));
+    m.addSource = () => { throw new Error('bad source'); };
+    expect(() => addDataLayer(m, crashes)).toThrow('bad source');
+    expect(listLayers(m)).toEqual([]);
+  });
+
   it('setBasemapVariant without a registered basemap says so', () => {
     expect(() => setBasemapVariant(fakeMap(base('night')), 'day')).toThrow(/useBasemap/);
   });

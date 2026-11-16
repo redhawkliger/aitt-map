@@ -2,6 +2,10 @@ import { measureValue, formatMeasure } from './geo.js';
 
 const SRC = 'aitt-measure';
 const LAYERS = ['aitt-measure-fill', 'aitt-measure-casing', 'aitt-measure-line', 'aitt-measure-points'];
+// Per map: which measurement is current, and whether double-click zoom was on before any measuring began. Only the
+// current measurement may turn it back on, so switching Distance -> Area doesn't re-enable it under the new one.
+const SESSIONS = new WeakMap();
+
 const HINT = { distance: 'Tap to add points', area: 'Tap 3 or more corners', width: 'Tap the other curb' };
 
 /**
@@ -70,8 +74,14 @@ export function startMeasure(map, mode, { units = 'ft', color = '#5AA2FF', halo 
     map.off('dblclick', onDblClick);
     window.removeEventListener('keydown', onKey);
     map.getCanvas().style.cursor = '';
-    // Re-enable double-click zoom after this double-click has finished, so it doesn't also zoom.
-    setTimeout(() => map.doubleClickZoom.enable(), 0);
+    // Restore double-click zoom after this double-click has finished (so it doesn't also zoom), unless a newer
+    // measurement has started meanwhile, and only if it was on before measuring.
+    setTimeout(() => {
+      const sess = SESSIONS.get(map);
+      if (sess?.active !== token) return;
+      SESSIONS.delete(map);
+      if (sess.wasEnabled) map.doubleClickZoom.enable();
+    }, 0);
   }
   function finish() {
     if (done || stopped) return;
@@ -89,6 +99,9 @@ export function startMeasure(map, mode, { units = 'ft', color = '#5AA2FF', halo 
   }
 
   clear();
+  const token = Symbol('measure');
+  const prev = SESSIONS.get(map);
+  SESSIONS.set(map, { active: token, wasEnabled: prev ? prev.wasEnabled : map.doubleClickZoom.isEnabled() });
   map.doubleClickZoom.disable();
   map.getCanvas().style.cursor = 'crosshair';
   map.on('click', onClick);

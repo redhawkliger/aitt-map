@@ -57,18 +57,26 @@ export function addDataLayer(map, { id, name, group, source, layers, visible = t
   const r = reg(map);
   if (r.entries.has(id) || map.getSource(id)) throw new LayerExistsError(id);
   if (!GROUPS.includes(group)) throw new Error(`Unknown layer group "${group}"`);
-  for (const l of layers) if (map.getLayer(l.id)) throw new LayerExistsError(l.id);
+  // Check every map layer id against the live map and against registered layers not yet on it (hidden ones).
+  const taken = new Set([...r.entries.values()].flatMap((e) => e.layers.map((l) => l.id)));
+  for (const l of layers) if (map.getLayer(l.id) || taken.has(l.id)) throw new LayerExistsError(l.id);
   const entry = { id, name, group, source, layers, restyle, visible: !!visible, opacity: clamp(opacity), added: false };
-  r.entries.set(id, entry);
   // A hidden layer costs nothing (no file opened, nothing to wait for) until it is first switched on.
-  if (entry.visible) mount(map, entry);
+  if (entry.visible) mount(map, entry); // throws on a bad spec, before anything is registered
+  r.entries.set(id, entry);
   changed(map);
 }
 
 function mount(map, entry) {
   const before = entry.group === 'imagery' ? firstLabelId(map) : undefined;
   map.addSource(entry.id, entry.source);
-  for (const l of entry.layers) map.addLayer(l, before);
+  try {
+    for (const l of entry.layers) map.addLayer(l, before);
+  } catch (err) {
+    for (const l of entry.layers) if (map.getLayer(l.id)) map.removeLayer(l.id);
+    map.removeSource(entry.id);
+    throw err;
+  }
   entry.added = true;
   applyVisible(map, entry);
   applyOpacity(map, entry);

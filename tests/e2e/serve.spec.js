@@ -13,3 +13,11 @@ test('a bare map renders tiles', async ({ page }) => {
     window.__map.queryRenderedFeatures().filter((f) => f.sourceLayer === 'roads').length);
   expect(roads).toBeGreaterThan(0);
 });
+
+test('bad data requests get an error answer and the server stays up', async ({ request }) => {
+  expect((await request.get('/data/')).status()).toBe(404);
+  expect((await request.get('/data/%E0%A4%A')).status()).toBe(400);
+  expect((await request.get('/data/..%2Fpackage.json')).status()).toBe(404);
+  const ok = await request.get('/data/california.pmtiles', { headers: { Range: 'bytes=0-15' } });
+  expect(ok.status()).toBe(206);
+});

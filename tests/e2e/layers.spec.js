@@ -48,3 +48,17 @@ test('with aerial photos on, the map still finishes loading', async ({ page }) =
   await ready(page, '/demo/?center=-122.0436,37.5934&zoom=16.5&layers=naip');
   expect(await page.evaluate(() => window.__map.loaded())).toBe(true);
 });
+
+test('keyboard users keep their place after toggling a layer or changing style', async ({ page }) => {
+  await ready(page);
+  const sw = page.getByRole('switch', { name: 'Aerial photos' });
+  await sw.focus();
+  await page.keyboard.press('Space');
+  await expect(sw).toBeChecked();
+  await expect(sw).toBeFocused();
+  const day = page.getByRole('radio', { name: 'Day' });
+  await day.focus();
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => window.__map.getStyle().name === 'aitt-day', null, { timeout: 10_000 });
+  await expect(page.getByRole('radio', { name: 'Day' })).toBeFocused();
+});
