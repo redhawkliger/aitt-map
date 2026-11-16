@@ -27,3 +27,13 @@
   background: rgba(11, 14, 17, 0.7) !important; color: #8E9AA6;
 }
 [data-map-variant="night"] .maplibregl-ctrl-attrib a { color: #C2CBD3; }
+
+/* Demo "Go to" list (top centre). */
+.aitt-goto { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 5; }
+.aitt-goto select {
+  font: 600 13px var(--font-body, Overpass, system-ui, sans-serif); padding: 8px 12px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92); color: #13181D; border: 1px solid #D3D8DD; cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+}
+[data-map-variant="night"] .aitt-goto select { background: rgba(21, 26, 31, 0.86); color: #E6EAEE; border-color: #29323B; }
+@media (max-width: 640px) { .aitt-goto { left: auto; right: 58px; transform: none; } }

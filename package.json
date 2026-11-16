@@ -17,8 +17,7 @@
     "basemap": "node scripts/get-basemap.mjs",
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test",
-    "traffic": "node scripts/get-traffic.mjs"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@protomaps/basemaps": "^5.7.2",

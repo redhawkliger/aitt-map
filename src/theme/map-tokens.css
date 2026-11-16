@@ -15,9 +15,7 @@
   --map-night-label-water:#5D8BA8; --map-night-poi:#8E9AA6; --map-night-poi-green:#4FA37A; --map-night-poi-blue:#6F9BD1;
   --map-night-building-3d-top:#3A4652; --map-night-glow:#C9A24A; --map-night-sky:#06080A; --map-night-haze:#1A2129;
   --map-night-light:#E6EAEE;
-  --map-night-tc-signal:#1B2127; --map-night-tc-lamp-red:#FF4438; --map-night-tc-lamp-amber:#FFB020; --map-night-tc-lamp-green:#1EE39A;
-  --map-night-tc-stop:#D7332A; --map-night-tc-white:#F4F5F7; --map-night-tc-crossing:#E9E4D4; --map-night-tc-bike:#3FBF7F;
-  --map-night-tc-bus:#5AA2FF; --map-night-tc-label:#AEB9C3; --map-night-measure:#5AA2FF;
+  --map-night-measure:#5AA2FF;
   /* day */
   --map-day-bg:#ECEEF0; --map-day-earth:#F4F5F7; --map-day-water:#C9DCEB; --map-day-water-label:#3F6E91;
   --map-day-park:#D8EAD9; --map-day-wood:#D2E4D3; --map-day-scrub:#E6ECE4; --map-day-sand:#EFEAD9;
@@ -31,9 +29,7 @@
   --map-day-poi-blue:#1F5FAD;
   --map-day-building-3d-top:#C2C9D0; --map-day-glow:#F2D58A; --map-day-sky:#DCE6F0; --map-day-haze:#ECEEF0;
   --map-day-light:#FFFFFF;
-  --map-day-tc-signal:#2B333B; --map-day-tc-lamp-red:#E5352B; --map-day-tc-lamp-amber:#F0A020; --map-day-tc-lamp-green:#13B67A;
-  --map-day-tc-stop:#C4261B; --map-day-tc-white:#FFFFFF; --map-day-tc-crossing:#F4F5F7; --map-day-tc-bike:#2E9B62;
-  --map-day-tc-bus:#1F5FAD; --map-day-tc-label:#57636F; --map-day-measure:#1F5FAD;
+  --map-day-measure:#1F5FAD;
   /* plan */
   --map-plan-bg:#FFFFFF; --map-plan-earth:#FFFFFF; --map-plan-water:#E3E8ED; --map-plan-water-label:#6B7680;
   --map-plan-park:#F1F3F1; --map-plan-wood:#F1F3F1; --map-plan-scrub:#F7F8F7; --map-plan-sand:#F7F7F4;
@@ -47,7 +43,5 @@
   --map-plan-poi-blue:#6B7680;
   --map-plan-building-3d-top:#E9EBED; --map-plan-glow:#FFFFFF; --map-plan-sky:#FFFFFF; --map-plan-haze:#FFFFFF;
   --map-plan-light:#FFFFFF;
-  --map-plan-tc-signal:#13181D; --map-plan-tc-lamp-red:#E9EBED; --map-plan-tc-lamp-amber:#B3BBC3; --map-plan-tc-lamp-green:#6B7680;
-  --map-plan-tc-stop:#13181D; --map-plan-tc-white:#FFFFFF; --map-plan-tc-crossing:#FFFFFF; --map-plan-tc-bike:#57636F;
-  --map-plan-tc-bus:#3A444E; --map-plan-tc-label:#3A444E; --map-plan-measure:#13181D;
+  --map-plan-measure:#13181D;
 }

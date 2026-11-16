@@ -3,8 +3,9 @@ import '../src/theme/map-tokens.css';
 import '../src/theme/controls.css';
 import '../src/theme/panel.css';
 import '../src/theme/measure.css';
+import { PLACES } from './places.js';
 import { createMap, buildStyle, readTokens, ATTRIBUTION, useBasemap, addDataLayer, mountLayerPanel, setLayerVisible,
-  trafficLayer, installTrafficIcons, mountMeasureBar } from '../src/index.js';
+  mountMeasureBar } from '../src/index.js';
 
 const q = new URLSearchParams(location.search);
 const BASEMAP = q.get('basemap') ?? import.meta.env.VITE_BASEMAP_URL ?? '/data/california.pmtiles';
@@ -28,16 +29,11 @@ if (map) {
   useBasemap(map, styleFor, variant);
   addDataLayer(map, {
     id: 'naip', name: 'Aerial photos', group: 'imagery', visible: false,
-    source: { type: 'raster', url: 'pmtiles://' + abs('/data/union-city-naip.pmtiles'), tileSize: 512,
+    source: { type: 'raster', url: 'pmtiles://' + abs(q.get('photos') ?? '/data/union-city-naip.pmtiles'), tileSize: 512,
       attribution: 'Aerial photos: USDA NAIP 2022' },
     layers: [{ id: 'naip-raster', type: 'raster', source: 'naip' }],
   });
-  // Traffic control (signals, signs, crosswalks, lanes, speed, bike lanes, bus stops), from scripts/get-traffic.mjs.
   const tokens = readTokens();
-  const trafficUrl = 'pmtiles://' + abs(q.get('traffic') ?? '/data/traffic.pmtiles');
-  installTrafficIcons(map, tokens);
-  addDataLayer(map, { ...trafficLayer(tokens, variant, trafficUrl),
-    restyle: (v) => trafficLayer(tokens, v, trafficUrl).layers });
   const panel = document.createElement('div');
   map.getContainer().appendChild(panel);
   mountLayerPanel(map, panel);
@@ -51,3 +47,21 @@ if (map) {
 }
 if (map && pitch) map.setPitch(pitch);
 map?.on('idle', () => { window.__mapIdle = true; });
+// First idle, in ms since navigation started: the phone timing gate reads it.
+map?.once('idle', () => { window.__mapIdleAt = performance.now(); });
+
+// "Go to": the three test places (no search yet).
+if (map) {
+  const label = document.createElement('label');
+  label.className = 'aitt-goto';
+  const select = document.createElement('select');
+  select.setAttribute('aria-label', 'Go to');
+  select.append(new Option('Go to…', ''), ...PLACES.map((p) => new Option(p.name, p.id)));
+  select.addEventListener('change', () => {
+    const p = PLACES.find((x) => x.id === select.value);
+    if (p) map.jumpTo({ center: p.center, zoom: p.zoom, pitch: 0, bearing: 0 });
+    select.value = '';
+  });
+  label.append(select);
+  map.getContainer().appendChild(label);
+}

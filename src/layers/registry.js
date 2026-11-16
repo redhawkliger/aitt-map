@@ -1,5 +1,5 @@
 /**
- * Data layers on top of the basemap: crashes, counts, aerial photos, the traffic-control layer, a tool's results.
+ * Data layers on top of the basemap: crashes, counts, aerial photos, a tool's results.
  * Each has an id, a name, a group, one source and one or more MapLibre layers, and can be switched on/off and faded.
  */
 
