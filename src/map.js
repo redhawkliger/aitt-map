@@ -6,10 +6,19 @@ export const DEFAULT_CENTER = [-122.0436, 37.5934]; // Union City Blvd at Dyer S
 export const DEFAULT_ZOOM = 15;
 export const ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · <a href="https://protomaps.com">Protomaps</a>';
 
+// A 1x1 transparent PNG. For a raster tile the file does not have (photos cover only the corridor), pmtiles answers
+// {data: null}, which leaves MapLibre waiting forever, so the map never reports "loaded". A blank tile ends the wait.
+const BLANK_PNG = Uint8Array.from(atob(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='), (c) => c.charCodeAt(0));
+
 let protocolAdded = false;
 function addProtocol() {
   if (protocolAdded) return;
-  maplibregl.addProtocol('pmtiles', new Protocol().tile);
+  const protocol = new Protocol();
+  maplibregl.addProtocol('pmtiles', async (params, abort) => {
+    const r = await protocol.tilev4(params, abort);
+    return r.data === null && params.type !== 'json' ? { data: BLANK_PNG } : r;
+  });
   protocolAdded = true;
 }
 

@@ -5,6 +5,8 @@ const BASE_URL = process.env.BASE_URL ?? 'http://localhost:5199';
 export default defineConfig({
   testDir: 'tests/e2e',
   timeout: 60_000,
+  // Each browser draws the map in software (SwiftShader); more than two at once starves the CPU and tests time out.
+  workers: 2,
   use: {
     baseURL: BASE_URL,
     launchOptions: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] },
