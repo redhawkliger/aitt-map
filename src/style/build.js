@@ -8,6 +8,9 @@ export const MAP_SLOTS = [
   'road-minor', 'road-link', 'road-major', 'road-highway', 'rail', 'boundary', 'label-road', 'label-road-major',
   'label-place', 'label-place-major', 'label-halo', 'label-water', 'poi', 'poi-green', 'poi-blue',
   'building-3d-top', 'glow', 'sky', 'haze', 'light',
+  // traffic-control layer (src/layers/traffic.js)
+  'tc-signal', 'tc-lamp-red', 'tc-lamp-amber', 'tc-lamp-green', 'tc-stop', 'tc-white', 'tc-crossing', 'tc-bike',
+  'tc-bus', 'tc-label',
 ];
 
 // Protomaps flavor key → our slot. First match wins. An unknown key throws, so a basemaps upgrade that adds a

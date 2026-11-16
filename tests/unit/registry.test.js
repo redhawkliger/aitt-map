@@ -80,6 +80,18 @@ describe('layer registry', () => {
     expect(listLayers(m).map((l) => [l.id, l.visible, l.opacity])).toEqual([['naip', true, 1], ['crashes', true, 0.4]]);
   });
 
+  it('a layer with restyle gets its colours for the new variant, and keeps its settings', () => {
+    const m = fakeMap(base('night'));
+    useBasemap(m, (v) => base(v));
+    const dots = (v) => [{ id: 'tc-dots', type: 'circle', source: 'tc', paint: { 'circle-color': v === 'night' ? '#111111' : '#eeeeee' } }];
+    addDataLayer(m, { id: 'tc', name: 'Traffic', group: 'data', source: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
+      layers: dots('night'), restyle: dots });
+    setLayerOpacity(m, 'tc', 0.5);
+    setBasemapVariant(m, 'day');
+    expect(m.getPaintProperty('tc-dots', 'circle-color')).toBe('#eeeeee');
+    expect(m.getPaintProperty('tc-dots', 'circle-opacity')).toBe(0.5);
+  });
+
   it('setBasemapVariant without a registered basemap says so', () => {
     expect(() => setBasemapVariant(fakeMap(base('night')), 'day')).toThrow(/useBasemap/);
   });

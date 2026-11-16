@@ -22,3 +22,10 @@ test('without WebGL the map says so instead of crashing', async ({ page }) => {
     "This browser can't draw the map (WebGL is off)", { timeout: 5_000 });
   expect(errors).toEqual([]);
 });
+
+test('a missing extra layer does not take the whole map offline', async ({ page }) => {
+  await page.goto('/demo/?traffic=/data/no-such-file.pmtiles&center=-122.0436,37.5934&zoom=15');
+  await page.waitForFunction(() => window.__mapIdle === true, null, { timeout: 30_000 });
+  await page.waitForTimeout(1500);
+  await expect(page.locator('.aitt-map-offline')).toHaveCount(0);
+});

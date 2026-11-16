@@ -2,7 +2,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../src/theme/map-tokens.css';
 import '../src/theme/controls.css';
 import '../src/theme/panel.css';
-import { createMap, buildStyle, readTokens, ATTRIBUTION, useBasemap, addDataLayer, mountLayerPanel, setLayerVisible } from '../src/index.js';
+import { createMap, buildStyle, readTokens, ATTRIBUTION, useBasemap, addDataLayer, mountLayerPanel, setLayerVisible,
+  trafficLayer, installTrafficIcons } from '../src/index.js';
 
 const q = new URLSearchParams(location.search);
 const BASEMAP = q.get('basemap') ?? import.meta.env.VITE_BASEMAP_URL ?? '/data/california.pmtiles';
@@ -30,6 +31,12 @@ if (map) {
       attribution: 'Aerial photos: USDA NAIP 2022' },
     layers: [{ id: 'naip-raster', type: 'raster', source: 'naip' }],
   });
+  // Traffic control (signals, signs, crosswalks, lanes, speed, bike lanes, bus stops), from scripts/get-traffic.mjs.
+  const tokens = readTokens();
+  const trafficUrl = 'pmtiles://' + abs(q.get('traffic') ?? '/data/traffic.pmtiles');
+  installTrafficIcons(map, tokens);
+  addDataLayer(map, { ...trafficLayer(tokens, variant, trafficUrl),
+    restyle: (v) => trafficLayer(tokens, v, trafficUrl).layers });
   const panel = document.createElement('div');
   map.getContainer().appendChild(panel);
   mountLayerPanel(map, panel);

@@ -67,7 +67,11 @@ export async function createMap({ container, basemapUrl, style, center = DEFAULT
   }
   // A basemap that can't be read (PC asleep, wrong URL) shows a plain message, never a blank map or a stack trace.
   map.on('error', (e) => {
-    if (e.sourceId === 'basemap' || /pmtiles|basemap|404|Failed to fetch/i.test(e.error?.message ?? '')) {
+    // Only the basemap failing takes the map offline; a missing extra layer (traffic, photos) just stays empty.
+    const msg = e.error?.message ?? '';
+    const basemapDown = e.sourceId ? e.sourceId === 'basemap'
+      : msg.includes(absolute) || (!map.loaded() && /pmtiles|404|Failed to fetch/i.test(msg));
+    if (basemapDown) {
       showMessage(container, 'Map data is offline');
     }
   });

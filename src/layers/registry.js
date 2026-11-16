@@ -50,9 +50,10 @@ function applyVisible(map, entry) {
 /**
  * @param {import('maplibre-gl').Map} map
  * @param {{id: string, name: string, group: 'basemap'|'data'|'imagery', source: object, layers: object[],
- *          visible?: boolean, opacity?: number}} spec
+ *          visible?: boolean, opacity?: number, restyle?: (variant: string) => object[]}} spec
+ *        restyle: rebuild the layers for another style variant (its colours), used by setBasemapVariant.
  */
-export function addDataLayer(map, { id, name, group, source, layers, visible = true, opacity = 1 }) {
+export function addDataLayer(map, { id, name, group, source, layers, visible = true, opacity = 1, restyle }) {
   const r = reg(map);
   if (r.entries.has(id) || map.getSource(id)) throw new LayerExistsError(id);
   if (!GROUPS.includes(group)) throw new Error(`Unknown layer group "${group}"`);
@@ -62,7 +63,7 @@ export function addDataLayer(map, { id, name, group, source, layers, visible = t
     if (map.getLayer(l.id)) throw new LayerExistsError(l.id);
     map.addLayer(l, before);
   }
-  const entry = { id, name, group, source, layers, visible: !!visible, opacity: clamp(opacity) };
+  const entry = { id, name, group, source, layers, restyle, visible: !!visible, opacity: clamp(opacity) };
   r.entries.set(id, entry);
   applyVisible(map, entry);
   applyOpacity(map, entry);
@@ -94,15 +95,28 @@ export function listLayers(map) {
   return [...reg(map).entries.values()].map(({ id, name, group, visible, opacity }) => ({ id, name, group, visible, opacity }));
 }
 
+// A layer spec with the entry's visibility and opacity written in, for putting into a whole new style.
+function withSettings(entry, l) {
+  const out = { ...l, layout: { ...l.layout, visibility: entry.visible ? 'visible' : 'none' }, paint: { ...l.paint } };
+  for (const p of OPACITY_PROPS[l.type] ?? []) out.paint[p] = (typeof l.paint?.[p] === 'number' ? l.paint[p] : 1) * entry.opacity;
+  return out;
+}
+
 /** Swap night/day/plan. Data layers, their order, visibility and opacity all carry over. */
 export function setBasemapVariant(map, variant) {
   const r = reg(map);
   if (!r.styleFor) throw new Error('Call useBasemap(map, styleFor) before setBasemapVariant');
   const entries = [...r.entries.values()];
+  const fresh = new Map(); // layer id -> rebuilt layer, for entries that restyle per variant
+  for (const e of entries) {
+    if (!e.restyle) continue;
+    e.layers = e.restyle(variant);
+    for (const l of e.layers) fresh.set(l.id, withSettings(e, l));
+  }
   const dataIds = new Set(entries.flatMap((e) => e.layers.map((l) => l.id)));
   map.setStyle(r.styleFor(variant), {
     transformStyle: (prev, next) => {
-      const carried = prev.layers.filter((l) => dataIds.has(l.id));
+      const carried = prev.layers.filter((l) => dataIds.has(l.id)).map((l) => fresh.get(l.id) ?? l);
       const sources = { ...next.sources };
       for (const e of entries) sources[e.id] = prev.sources[e.id] ?? e.source;
       const imagery = carried.filter((l) => entries.find((e) => e.group === 'imagery' && e.layers.some((x) => x.id === l.id)));
