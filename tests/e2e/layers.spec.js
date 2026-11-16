@@ -10,7 +10,8 @@ test('the aerial layer turns on and off from the panel', async ({ page }) => {
   await ready(page);
   const sw = page.getByRole('switch', { name: 'Aerial photos' });
   await expect(sw).not.toBeChecked();
-  expect(await vis(page, 'naip-raster')).toBe('none');
+  // Hidden layers are not added to the map (no file opened) until first switched on.
+  expect(await page.evaluate(() => window.__map.getLayer('naip-raster'))).toBeUndefined();
   await sw.click();
   await expect(sw).toBeChecked();
   expect(await vis(page, 'naip-raster')).toBe('visible');
