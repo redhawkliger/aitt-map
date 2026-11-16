@@ -42,7 +42,7 @@ if (map) {
         tiles: ['https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}'],
         attribution: 'Imagery: USGS The National Map, USDA NAIP' },
       ...Object.fromEntries(crisp.map((u, i) => [`sat-crisp-${i}`, { type: 'raster', url: 'pmtiles://' + abs(u), tileSize: 512,
-        attribution: 'Aerial photos: USDA NAIP 2022' }])),
+        attribution: 'Aerial photos: USDA NAIP 2024' }])),
     },
     layers: [{ id: 'sat-usgs', type: 'raster', source: 'sat-usgs' },
       ...crisp.map((_, i) => ({ id: `sat-crisp-${i}`, type: 'raster', source: `sat-crisp-${i}` }))],

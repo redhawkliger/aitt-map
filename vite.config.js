@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { createReadStream, statSync, existsSync, readFileSync } from 'node:fs';
+import { createReadStream, statSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 import { pipeline } from 'node:stream';
 import { join, normalize, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -57,8 +57,13 @@ function previewHeaders() {
   };
 }
 
+// The crisp aerial photos: one file per county in data/naip/. A hosted build passes VITE_PHOTOS_URLS instead.
+const localPhotos = existsSync(join(DATA, 'naip'))
+  ? readdirSync(join(DATA, 'naip')).filter((f) => f.endsWith('.pmtiles')).sort().map((f) => `/data/naip/${f}`) : [];
+
 export default defineConfig({
   plugins: [serveData(), previewHeaders()],
+  define: process.env.VITE_PHOTOS_URLS ? {} : { 'import.meta.env.VITE_PHOTOS_URLS': JSON.stringify(localPhotos.join(',') || '/data/union-city-naip.pmtiles') },
   build: { rollupOptions: { input: { demo: 'demo/index.html', sim: 'demo/sim.html' } } },
   test: { include: ['tests/unit/**/*.test.js'] },
 });

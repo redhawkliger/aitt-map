@@ -11,22 +11,24 @@ import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const BUCKET = 'aitt-map';
+// Crisp aerial photos, one file per county (USDA NAIP 2024, road corridors only), from projects/naip-store.
+const PHOTOS = 'imagery/naip-2024';
 
 /** Every file that goes up, with its key in the bucket. Pure, so it can be tested. */
-export function planUpload({ build, fonts }) {
+export function planUpload({ build, fonts, photos = [] }) {
   return [
     { local: 'data/california.pmtiles', key: `basemap/v${build}.pmtiles`, contentType: 'application/octet-stream' },
-    { local: 'data/union-city-naip.pmtiles', key: 'imagery/union-city-naip-2022.pmtiles', contentType: 'application/octet-stream' },
+    ...photos.map((f) => ({ local: `data/naip/${f}`, key: `${PHOTOS}/${f}`, contentType: 'application/octet-stream' })),
     ...fonts.map((f) => ({ local: `public/fonts/${f}`, key: `fonts/${f}`, contentType: 'application/x-protobuf' })),
   ];
 }
 
 /** The addresses apps use once the files are up. The basemap address names an exact build. */
-export function publicUrls(base, build) {
+export function publicUrls(base, build, photos = []) {
   const b = base.replace(/\/$/, '');
   return {
     basemapUrl: `${b}/basemap/v${build}.pmtiles`,
-    photosUrl: `${b}/imagery/union-city-naip-2022.pmtiles`,
+    photosUrls: photos.map((f) => `${b}/${PHOTOS}/${f}`),
     glyphs: `${b}/fonts/{fontstack}/{range}.pbf`,
   };
 }
@@ -37,10 +39,16 @@ function listFonts(root = 'public/fonts') {
   return out;
 }
 
+/** The county photo files in data/naip/, in a fixed order. */
+export function listPhotos(root = 'data/naip') {
+  return existsSync(root) ? readdirSync(root).filter((f) => f.endsWith('.pmtiles')).sort() : [];
+}
+
 async function main() {
   const dry = process.argv.includes('--dry-run');
   const { build } = JSON.parse(readFileSync('data/basemap.json', 'utf8'));
-  const plan = planUpload({ build, fonts: listFonts() }).filter((p) => existsSync(p.local));
+  const photos = listPhotos();
+  const plan = planUpload({ build, fonts: listFonts(), photos }).filter((p) => existsSync(p.local));
   const bytes = plan.reduce((n, p) => n + statSync(p.local).size, 0);
   console.log(`${plan.length} files, ${(bytes / 1e9).toFixed(2)} GB, to r2://${BUCKET}`);
   if (dry) { for (const p of plan) console.log(`  ${p.local} -> ${p.key}`); return; }
@@ -65,9 +73,9 @@ async function main() {
     if (size > 100e6) process.stdout.write('\n');
     done++;
   }
-  const urls = publicUrls(process.env.R2_PUBLIC_URL, build);
+  const urls = publicUrls(process.env.R2_PUBLIC_URL, build, photos);
   writeFileSync('hosting.json', JSON.stringify({ ...urls, build, uploaded: new Date().toISOString() }, null, 2) + '\n');
   console.log(`${done}/${plan.length} files in the bucket; wrote hosting.json:`, urls);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) await main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
