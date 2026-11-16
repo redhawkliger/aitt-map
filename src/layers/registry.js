@@ -29,7 +29,7 @@ const changed = (map) => map.fire?.('aitt:layers');
 
 /** The id of the first basemap label layer: aerial photos go under it so names stay readable on top. */
 function firstLabelId(map) {
-  const data = new Set([...reg(map).entries.values()].flatMap((e) => e.layers.map((l) => l.id)));
+  const data = new Set([...reg(map).entries.values()].filter((e) => e.added).flatMap((e) => e.layers.map((l) => l.id)));
   return map.getStyle().layers.find((l) => l.type === 'symbol' && !data.has(l.id))?.id;
 }
 
@@ -57,17 +57,21 @@ export function addDataLayer(map, { id, name, group, source, layers, visible = t
   const r = reg(map);
   if (r.entries.has(id) || map.getSource(id)) throw new LayerExistsError(id);
   if (!GROUPS.includes(group)) throw new Error(`Unknown layer group "${group}"`);
-  const before = group === 'imagery' ? firstLabelId(map) : undefined;
-  map.addSource(id, source);
-  for (const l of layers) {
-    if (map.getLayer(l.id)) throw new LayerExistsError(l.id);
-    map.addLayer(l, before);
-  }
-  const entry = { id, name, group, source, layers, restyle, visible: !!visible, opacity: clamp(opacity) };
+  for (const l of layers) if (map.getLayer(l.id)) throw new LayerExistsError(l.id);
+  const entry = { id, name, group, source, layers, restyle, visible: !!visible, opacity: clamp(opacity), added: false };
   r.entries.set(id, entry);
+  // A hidden layer costs nothing (no file opened, nothing to wait for) until it is first switched on.
+  if (entry.visible) mount(map, entry);
+  changed(map);
+}
+
+function mount(map, entry) {
+  const before = entry.group === 'imagery' ? firstLabelId(map) : undefined;
+  map.addSource(entry.id, entry.source);
+  for (const l of entry.layers) map.addLayer(l, before);
+  entry.added = true;
   applyVisible(map, entry);
   applyOpacity(map, entry);
-  changed(map);
 }
 
 function entryOf(map, id) {
@@ -79,14 +83,14 @@ function entryOf(map, id) {
 export function setLayerVisible(map, id, visible) {
   const e = entryOf(map, id);
   e.visible = !!visible;
-  applyVisible(map, e);
+  if (!e.added) { if (e.visible) mount(map, e); } else applyVisible(map, e);
   changed(map);
 }
 
 export function setLayerOpacity(map, id, opacity) {
   const e = entryOf(map, id);
   e.opacity = clamp(opacity);
-  applyOpacity(map, e);
+  if (e.added) applyOpacity(map, e);
   changed(map);
 }
 
@@ -106,7 +110,8 @@ function withSettings(entry, l) {
 export function setBasemapVariant(map, variant) {
   const r = reg(map);
   if (!r.styleFor) throw new Error('Call useBasemap(map, styleFor) before setBasemapVariant');
-  const entries = [...r.entries.values()];
+  for (const e of r.entries.values()) if (!e.added && e.restyle) e.layers = e.restyle(variant);
+  const entries = [...r.entries.values()].filter((e) => e.added);
   const fresh = new Map(); // layer id -> rebuilt layer, for entries that restyle per variant
   for (const e of entries) {
     if (!e.restyle) continue;

@@ -59,7 +59,7 @@ describe('layer registry', () => {
 
   it('aerial photos go under the labels, data goes on top', () => {
     const m = fakeMap(base('night'));
-    addDataLayer(m, photos);
+    addDataLayer(m, { ...photos, visible: true });
     addDataLayer(m, crashes);
     expect(m.getStyle().layers.map((l) => l.id)).toEqual(['earth', 'naip-raster', 'labels', 'crashes-dots']);
   });
@@ -90,6 +90,29 @@ describe('layer registry', () => {
     setBasemapVariant(m, 'day');
     expect(m.getPaintProperty('tc-dots', 'circle-color')).toBe('#eeeeee');
     expect(m.getPaintProperty('tc-dots', 'circle-opacity')).toBe(0.5);
+  });
+
+  it('a hidden layer costs nothing until it is switched on (its source is added then)', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, photos);
+    expect(m.getSource('naip')).toBeUndefined();
+    expect(listLayers(m)).toEqual([{ id: 'naip', name: 'Aerial photos', group: 'imagery', visible: false, opacity: 1 }]);
+    setLayerOpacity(m, 'naip', 0.5);
+    setLayerVisible(m, 'naip', true);
+    expect(m.getSource('naip')).toBeDefined();
+    expect(m.getStyle().layers.map((l) => l.id)).toEqual(['earth', 'naip-raster', 'labels']);
+    expect(m.getPaintProperty('naip-raster', 'raster-opacity')).toBe(0.5);
+    expect(() => addDataLayer(m, photos)).toThrow(LayerExistsError);
+  });
+
+  it('a style swap keeps a never-shown layer pending, and it still appears when switched on', () => {
+    const m = fakeMap(base('night'));
+    useBasemap(m, (v) => base(v));
+    addDataLayer(m, photos);
+    setBasemapVariant(m, 'day');
+    expect(m.getSource('naip')).toBeUndefined();
+    setLayerVisible(m, 'naip', true);
+    expect(m.getStyle().layers.map((l) => l.id)).toEqual(['earth', 'naip-raster', 'labels']);
   });
 
   it('setBasemapVariant without a registered basemap says so', () => {
