@@ -19,6 +19,7 @@
     "test": "vitest run && playwright test",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
+    "traffic": "node scripts/get-traffic.mjs",
     "upload": "node scripts/upload-r2.mjs",
     "deploy": "node scripts/deploy-pages.mjs"
   },

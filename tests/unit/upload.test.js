@@ -2,20 +2,19 @@ import { describe, it, expect } from 'vitest';
 import { planUpload, publicUrls } from '../../scripts/upload-r2.mjs';
 
 describe('R2 upload plan', () => {
-  const photos = ['alameda-county-ca.pmtiles', 'san-francisco-ca.pmtiles'];
-  const plan = planUpload({ build: '20261114', fonts: ['Overpass Regular/0-255.pbf', 'Overpass Bold/256-511.pbf'], photos });
+  const plan = planUpload({ build: '20261114', roadDetails: '20261116', fonts: ['Overpass Regular/0-255.pbf', 'Overpass Bold/256-511.pbf'] });
 
   it('the basemap goes up under its exact build date, so rollback is a one-line change', () => {
     const b = plan.find((x) => x.local === 'data/california.pmtiles');
     expect(b.key).toBe('basemap/v20261114.pmtiles');
     expect(b.contentType).toBe('application/octet-stream');
   });
-  it('each county photo file goes up under imagery/naip-2024/ with its own name', () => {
-    const p = plan.filter((x) => x.key.startsWith('imagery/'));
-    expect(p.map((x) => [x.local, x.key])).toEqual([
-      ['data/naip/alameda-county-ca.pmtiles', 'imagery/naip-2024/alameda-county-ca.pmtiles'],
-      ['data/naip/san-francisco-ca.pmtiles', 'imagery/naip-2024/san-francisco-ca.pmtiles'],
-    ]);
+  it('road details go up under their own build date', () => {
+    const r = plan.find((x) => x.local === 'data/traffic.pmtiles');
+    expect(r.key).toBe('layers/road-details-v20261116.pmtiles');
+  });
+  it('no aerial photos are planned any more (owner dropped Satellite, 2026-11-16)', () => {
+    expect(plan.filter((x) => x.key.startsWith('imagery/'))).toEqual([]);
   });
   it('fonts keep their folder names and are marked as protobuf', () => {
     const f = plan.filter((x) => x.key.startsWith('fonts/'));
@@ -23,12 +22,9 @@ describe('R2 upload plan', () => {
     expect(f.every((x) => x.contentType === 'application/x-protobuf' && x.local.startsWith('public/fonts/'))).toBe(true);
   });
   it('builds the public URLs the demo and other apps use', () => {
-    expect(publicUrls('https://tiles.aitransportationtools.com/', '20261114', photos)).toEqual({
+    expect(publicUrls('https://tiles.aitransportationtools.com/', '20261114', '20261116')).toEqual({
       basemapUrl: 'https://tiles.aitransportationtools.com/basemap/v20261114.pmtiles',
-      photosUrls: [
-        'https://tiles.aitransportationtools.com/imagery/naip-2024/alameda-county-ca.pmtiles',
-        'https://tiles.aitransportationtools.com/imagery/naip-2024/san-francisco-ca.pmtiles',
-      ],
+      roadDetailsUrl: 'https://tiles.aitransportationtools.com/layers/road-details-v20261116.pmtiles',
       glyphs: 'https://tiles.aitransportationtools.com/fonts/{fontstack}/{range}.pbf',
     });
   });

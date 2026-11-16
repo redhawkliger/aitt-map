@@ -5,9 +5,7 @@ import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 
 const h = JSON.parse(readFileSync('hosting.json', 'utf8'));
-// The satellite layer takes a comma-separated list of crisp photo files (one per area).
-const env = { ...process.env, VITE_BASEMAP_URL: h.basemapUrl,
-  VITE_PHOTOS_URLS: (h.photosUrls ?? [h.photosUrl]).join(',') };
+const env = { ...process.env, VITE_BASEMAP_URL: h.basemapUrl, VITE_ROAD_DETAILS_URL: h.roadDetailsUrl };
 execSync('npx vite build', { stdio: 'inherit', env });
 execSync('npx wrangler deploy', { stdio: 'inherit', env });
 console.log('Deployed. Demo: https://map.aitransportationtools.com/demo/ (also https://aitt-map.akshaeysabha.workers.dev/demo/)');

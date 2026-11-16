@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addDataLayer, setLayerVisible, setLayerOpacity, setLayerFade, listLayers, setBasemapVariant, useBasemap, LayerExistsError }
+import { addDataLayer, setLayerVisible, setLayerOpacity, setLayerFade, listLayers, setBasemapVariant, useBasemap, setLayerData, LayerExistsError }
   from '../../src/layers/registry.js';
 
 // A stand-in for maplibregl.Map with just the style calls the registry uses (the real map needs WebGL).
@@ -195,5 +195,19 @@ describe('layer registry', () => {
     addDataLayer(m, crashes);
     expect('fade' in listLayers(m)[0]).toBe(false);
   });
-});
 
+  it('new data given to a switched-off layer shows when it is switched on', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, { ...crashes, visible: false });
+    const one = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: { k: 'K' }, geometry: { type: 'Point', coordinates: [0, 0] } }] };
+    setLayerData(m, 'crashes', one);
+    setLayerVisible(m, 'crashes', true);
+    expect(m.getSource('crashes').data).toEqual(one);
+  });
+
+  it('only GeoJSON layers take new data', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, photos);
+    expect(() => setLayerData(m, 'naip', {})).toThrow(/not GeoJSON/);
+  });
+});

@@ -11,24 +11,24 @@ import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const BUCKET = 'aitt-map';
-// Crisp aerial photos, one file per county (USDA NAIP 2024, road corridors only), from projects/naip-store.
-const PHOTOS = 'imagery/naip-2024';
+// Road details (signals, signs, crosswalks, lanes, speed, bike lanes, bus stops), from npm run traffic.
+const ROAD = (date) => `layers/road-details-v${date}.pmtiles`;
 
 /** Every file that goes up, with its key in the bucket. Pure, so it can be tested. */
-export function planUpload({ build, fonts, photos = [] }) {
+export function planUpload({ build, roadDetails, fonts }) {
   return [
     { local: 'data/california.pmtiles', key: `basemap/v${build}.pmtiles`, contentType: 'application/octet-stream' },
-    ...photos.map((f) => ({ local: `data/naip/${f}`, key: `${PHOTOS}/${f}`, contentType: 'application/octet-stream' })),
+    ...(roadDetails ? [{ local: 'data/traffic.pmtiles', key: ROAD(roadDetails), contentType: 'application/octet-stream' }] : []),
     ...fonts.map((f) => ({ local: `public/fonts/${f}`, key: `fonts/${f}`, contentType: 'application/x-protobuf' })),
   ];
 }
 
-/** The addresses apps use once the files are up. The basemap address names an exact build. */
-export function publicUrls(base, build, photos = []) {
+/** The addresses apps use once the files are up. Each map file address names an exact build. */
+export function publicUrls(base, build, roadDetails) {
   const b = base.replace(/\/$/, '');
   return {
     basemapUrl: `${b}/basemap/v${build}.pmtiles`,
-    photosUrls: photos.map((f) => `${b}/${PHOTOS}/${f}`),
+    ...(roadDetails ? { roadDetailsUrl: `${b}/${ROAD(roadDetails)}` } : {}),
     glyphs: `${b}/fonts/{fontstack}/{range}.pbf`,
   };
 }
@@ -37,11 +37,6 @@ function listFonts(root = 'public/fonts') {
   const out = [];
   for (const dir of readdirSync(root)) for (const f of readdirSync(join(root, dir))) out.push(relative(root, join(root, dir, f)).replaceAll('\\', '/'));
   return out;
-}
-
-/** The county photo files in data/naip/, in a fixed order. */
-export function listPhotos(root = 'data/naip') {
-  return existsSync(root) ? readdirSync(root).filter((f) => f.endsWith('.pmtiles')).sort() : [];
 }
 
 const PROMPTS = [
@@ -73,8 +68,10 @@ function ask(label, secret) {
 async function main() {
   const dry = process.argv.includes('--dry-run');
   const { build } = JSON.parse(readFileSync('data/basemap.json', 'utf8'));
-  const photos = listPhotos();
-  const plan = planUpload({ build, fonts: listFonts(), photos }).filter((p) => existsSync(p.local));
+  // The road details build date (YYYYMMDD) names its file, like the basemap's.
+  const roadDetails = existsSync('data/traffic.json')
+    ? JSON.parse(readFileSync('data/traffic.json', 'utf8')).built.slice(0, 10).replaceAll('-', '') : undefined;
+  const plan = planUpload({ build, roadDetails, fonts: listFonts() }).filter((p) => existsSync(p.local));
   const bytes = plan.reduce((n, p) => n + statSync(p.local).size, 0);
   console.log(`${plan.length} files, ${(bytes / 1e9).toFixed(2)} GB, to r2://${BUCKET}`);
   if (dry) { for (const p of plan) console.log(`  ${p.local} -> ${p.key}`); return; }
@@ -95,13 +92,13 @@ async function main() {
     if (have === size) { done++; continue; }
     const up = new Upload({ client: s3, queueSize: 4, partSize: 64 * 1024 * 1024,
       params: { Bucket: BUCKET, Key: p.key, Body: createReadStream(p.local), ContentType: p.contentType,
-        CacheControl: p.key.startsWith('basemap/') ? 'public, max-age=31536000, immutable' : 'public, max-age=86400' } });
+        CacheControl: /^(basemap|layers)\//.test(p.key) ? 'public, max-age=31536000, immutable' : 'public, max-age=86400' } });
     if (size > 100e6) up.on('httpUploadProgress', (e) => process.stdout.write(`\r  ${p.key} ${Math.round((100 * e.loaded) / size)}%`));
     await up.done();
     if (size > 100e6) process.stdout.write('\n');
     done++;
   }
-  const urls = publicUrls(process.env.R2_PUBLIC_URL, build, photos);
+  const urls = publicUrls(process.env.R2_PUBLIC_URL, build, roadDetails);
   writeFileSync('hosting.json', JSON.stringify({ ...urls, build, uploaded: new Date().toISOString() }, null, 2) + '\n');
   console.log(`${done}/${plan.length} files in the bucket; wrote hosting.json:`, urls);
 }

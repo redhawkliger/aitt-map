@@ -6,7 +6,7 @@ import '../src/theme/measure.css';
 import { PLACES } from './places.js';
 import { dataUrl } from './urls.js';
 import { createMap, buildStyle, readTokens, ATTRIBUTION, useBasemap, addDataLayer, mountLayerPanel, setLayerVisible,
-  mountMeasureBar } from '../src/index.js';
+  mountMeasureBar, trafficLayer, installTrafficIcons, basemapVariant } from '../src/index.js';
 
 const q = new URLSearchParams(location.search);
 const env = { dev: import.meta.env.DEV, origin: location.origin };
@@ -27,27 +27,24 @@ const map = await createMap({
   ...(center ? { center } : {}), ...(zoom !== undefined ? { zoom } : {}),
 });
 window.__map = map;
+let addRoadDetails = () => {};
+let detailsAdded = !map;
 if (map) {
   useBasemap(map, styleFor, variant);
-  // Satellite: USGS National Map imagery for all of California underneath (free, public domain, sharp to zoom 16),
-  // and our own crisp 0.6 m NAIP road-corridor files on top where we have them (transparent elsewhere).
-  // ?photos=a.pmtiles,b.pmtiles overrides the crisp files (each checked like any link address).
-  const crisp = q.has('photos')
-    ? q.get('photos').split(',').map((u) => dataUrl(u, '/data/union-city-naip.pmtiles', env))
-    : (import.meta.env.VITE_PHOTOS_URLS ?? '/data/union-city-naip.pmtiles').split(',');
-  addDataLayer(map, {
-    id: 'satellite', name: 'Satellite', group: 'imagery', visible: false,
-    sources: {
-      'sat-usgs': { type: 'raster', tileSize: 256, maxzoom: 16,
-        tiles: ['https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}'],
-        attribution: 'Imagery: USGS The National Map, USDA NAIP' },
-      ...Object.fromEntries(crisp.map((u, i) => [`sat-crisp-${i}`, { type: 'raster', url: 'pmtiles://' + abs(u), tileSize: 512,
-        attribution: 'Aerial photos: USDA NAIP 2024' }])),
-    },
-    layers: [{ id: 'sat-usgs', type: 'raster', source: 'sat-usgs' },
-      ...crisp.map((_, i) => ({ id: `sat-crisp-${i}`, type: 'raster', source: `sat-crisp-${i}` }))],
-  });
   const tokens = readTokens();
+  // Road details for all four apps: signals, stop and yield signs, crosswalks, lane and speed labels, bike lanes and
+  // bus stops (data/traffic.pmtiles, npm run traffic). ?traffic=<file> overrides it (checked like any link address).
+  const trafficUrl = 'pmtiles://' + abs(dataUrl(q.get('traffic'), import.meta.env.VITE_ROAD_DETAILS_URL ?? '/data/traffic.pmtiles', env));
+  // Added just after the base map first appears, so the first view stays fast on a phone (the 2 s gate); the details
+  // fill in a moment later. ?layers=<id>,... turns layers on at load (handy for links and screenshots).
+  addRoadDetails = () => {
+    installTrafficIcons(map, tokens);
+    addDataLayer(map, { ...trafficLayer(tokens, basemapVariant(map), trafficUrl),
+      restyle: (v) => trafficLayer(tokens, v, trafficUrl).layers });
+    for (const id of q.get('layers')?.split(',') ?? []) setLayerVisible(map, id, true);
+    detailsAdded = true;
+    map.triggerRepaint();
+  };
   const panel = document.createElement('div');
   map.getContainer().appendChild(panel);
   mountLayerPanel(map, panel);
@@ -56,13 +53,12 @@ if (map) {
   const measure = mountMeasureBar(map, bar, { colors: (v) => ({ color: tokens[`--map-${v}-measure`],
     halo: tokens[`--map-${v}-label-halo`] }) });
   Object.defineProperty(window, '__measure', { get: () => measure.current() });
-  // ?layers=naip,... turns layers on at load (handy for links and screenshots).
-  for (const id of q.get('layers')?.split(',') ?? []) setLayerVisible(map, id, true);
 }
 if (map && pitch) map.setPitch(pitch);
-map?.on('idle', () => { window.__mapIdle = true; });
-// First idle, in ms since navigation started: the phone timing gate reads it.
-map?.once('idle', () => { window.__mapIdleAt = performance.now(); });
+// "Ready" for tests and screenshots: idle with the road details on the map.
+map?.on('idle', () => { if (detailsAdded) window.__mapIdle = true; });
+// First idle, in ms since navigation started: the phone timing gate reads it. Then the road details go on.
+map?.once('idle', () => { window.__mapIdleAt = performance.now(); addRoadDetails(); });
 // MapLibre 6 can fire its first idle while createMap is still resolving, before the lines above run; a still map
 // then never fires another. One more redraw guarantees an idle after we start listening.
 map?.triggerRepaint();

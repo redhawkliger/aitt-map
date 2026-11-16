@@ -106,6 +106,17 @@ function entryOf(map, id) {
   return e;
 }
 
+/**
+ * Replace the GeoJSON data of an overlay (e.g. new crash results). The new data also survives a style swap.
+ */
+export function setLayerData(map, id, data) {
+  const e = entryOf(map, id);
+  const sid = Object.keys(e.sources)[0];
+  if (e.sources[sid].type !== 'geojson') throw new Error(`Layer "${id}" is not GeoJSON`);
+  e.sources[sid] = { ...e.sources[sid], data };
+  map.getSource(sid)?.setData(data);
+}
+
 export function setLayerVisible(map, id, visible) {
   const e = entryOf(map, id);
   e.visible = !!visible;

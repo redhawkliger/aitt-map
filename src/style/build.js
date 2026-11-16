@@ -23,6 +23,11 @@ export const MAP_SLOTS = [
   'road-minor', 'road-link', 'road-major', 'road-highway', 'rail', 'boundary', 'label-road', 'label-road-major',
   'label-place', 'label-place-major', 'label-halo', 'label-water', 'poi', 'poi-green', 'poi-blue',
   'building-3d-top', 'glow', 'sky', 'haze', 'light',
+  // road details layer (src/layers/traffic.js)
+  'tc-signal', 'tc-lamp-red', 'tc-lamp-amber', 'tc-lamp-green', 'tc-stop', 'tc-white', 'tc-crossing', 'tc-bike',
+  'tc-bus', 'tc-label',
+  // app overlays (src/layers/overlays.js): 6-step value ramp, best/lowest to worst/highest (LOS A-F, KABCO)
+  'ramp-1', 'ramp-2', 'ramp-3', 'ramp-4', 'ramp-5', 'ramp-6',
   // measure tool line
   'measure',
   // building edges
