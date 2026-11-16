@@ -21,3 +21,8 @@ npm test          # unit (Vitest) + browser (Playwright) tests
 The basemap tool is go-pmtiles 1.31.2 (downloaded into `bin/` on first run). California, bbox
 -124.5,32.4,-114.0,42.1, zooms 0–15 (closer zooms reuse z15). First build: Protomaps 2026-11-14, 1.52 GB.
 `data/` is never committed.
+
+## Look
+
+Night is the main style, accepted by the owner on 2026-11-15 after two rounds of polish (freeway glow, height-shaded
+3D buildings, sky and haze; bigger, brighter street names). Day and Plan exist and will get the same care later.
