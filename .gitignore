@@ -5,3 +5,10 @@ dist/
 test-results/
 playwright-report/
 .superpowers/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example

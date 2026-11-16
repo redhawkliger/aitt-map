@@ -1,0 +1,75 @@
+/* Map tokens: the Signal Flow palette applied to a map. One block per style variant.
+   night = Signal Flow dark surfaces + road/paint tokens; day = Signal Flow light; plan = near-monochrome for print.
+   Signal colours (go / amber / stop) are not used here: on a map they are kept for results that mean something. */
+:root {
+  /* night */
+  --map-night-bg:#0F1318; --map-night-earth:#14191F; --map-night-water:#0C1A24; --map-night-water-label:#5D8BA8;
+  --map-night-park:#0E1D17; --map-night-wood:#0F1A15; --map-night-scrub:#12171A; --map-night-sand:#1A1A17;
+  --map-night-school:#15171C; --map-night-hospital:#1A1517; --map-night-industrial:#13161A;
+  --map-night-pedestrian:#161B20; --map-night-aerodrome:#14181C; --map-night-runway:#22282E; --map-night-pier:#1B2127;
+  --map-night-building:#242C35; --map-night-building-3d:#222A33; --map-night-casing:#0A0D10; --map-night-tunnel:#1B2127;
+  --map-night-road-other:#2C343D; --map-night-road-minor:#46515D; --map-night-road-link:#5F6B78;
+  --map-night-road-major:#626F7C; --map-night-road-highway:#B39752; --map-night-rail:#2A3138;
+  --map-night-boundary:#57636F; --map-night-label-road:#C2CBD3; --map-night-label-road-major:#EEF1F4;
+  --map-night-label-place:#A7B2BC; --map-night-label-place-major:#E6EAEE; --map-night-label-halo:#0A0D10;
+  --map-night-label-water:#5D8BA8; --map-night-poi:#8E9AA6; --map-night-poi-green:#4FA37A; --map-night-poi-blue:#6F9BD1;
+  --map-night-building-3d-top:#4A5867; --map-night-glow:#D4AE55; --map-night-sky:#06080A; --map-night-haze:#1A2129;
+  --map-night-light:#E6EAEE;
+  --map-night-measure:#5AA2FF; --map-night-building-line:#36414C;
+  /* day */
+  --map-day-bg:#ECEEF0; --map-day-earth:#F4F5F7; --map-day-water:#A9CDEE; --map-day-water-label:#2E6A9C;
+  --map-day-park:#C8E7CA; --map-day-wood:#BEDDC1; --map-day-scrub:#E1EDDC; --map-day-sand:#EFEAD9;
+  --map-day-school:#ECE9F1; --map-day-hospital:#F3E6E8; --map-day-industrial:#E8E9EC; --map-day-pedestrian:#F0F1F3;
+  --map-day-aerodrome:#E6E8EC; --map-day-runway:#D3D8DD; --map-day-pier:#E1E4E8; --map-day-building:#E3E6EA;
+  --map-day-building-3d:#D3D8DD; --map-day-casing:#C2C9D0; --map-day-tunnel:#E4E7EA; --map-day-road-other:#FFFFFF;
+  --map-day-road-minor:#FFFFFF; --map-day-road-link:#FFFFFF; --map-day-road-major:#FFFFFF;
+  --map-day-road-highway:#F2D58A; --map-day-rail:#B3BBC3; --map-day-boundary:#8E9AA6; --map-day-label-road:#57636F;
+  --map-day-label-road-major:#2B333B; --map-day-label-place:#3A444E; --map-day-label-place-major:#13181D;
+  --map-day-label-halo:#FFFFFF; --map-day-label-water:#2E6A9C; --map-day-poi:#57636F; --map-day-poi-green:#3E8A5F;
+  --map-day-poi-blue:#1F5FAD;
+  --map-day-building-3d-top:#C2C9D0; --map-day-glow:#F2D58A; --map-day-sky:#DCE6F0; --map-day-haze:#ECEEF0;
+  --map-day-light:#FFFFFF;
+  --map-day-measure:#1F5FAD; --map-day-building-line:#C9CFD6;
+  /* plan */
+  --map-plan-bg:#FFFFFF; --map-plan-earth:#FFFFFF; --map-plan-water:#E3E8ED; --map-plan-water-label:#6B7680;
+  --map-plan-park:#F1F3F1; --map-plan-wood:#F1F3F1; --map-plan-scrub:#F7F8F7; --map-plan-sand:#F7F7F4;
+  --map-plan-school:#F7F7F7; --map-plan-hospital:#F7F7F7; --map-plan-industrial:#F7F7F7; --map-plan-pedestrian:#F7F7F7;
+  --map-plan-aerodrome:#F5F5F5; --map-plan-runway:#DADDE0; --map-plan-pier:#EEEEEE; --map-plan-building:#E9EBED;
+  --map-plan-building-3d:#E9EBED; --map-plan-casing:#9AA3AB; --map-plan-tunnel:#EEEEEE; --map-plan-road-other:#FFFFFF;
+  --map-plan-road-minor:#FFFFFF; --map-plan-road-link:#FFFFFF; --map-plan-road-major:#FFFFFF;
+  --map-plan-road-highway:#FFFFFF; --map-plan-rail:#8E9AA6; --map-plan-boundary:#57636F; --map-plan-label-road:#3A444E;
+  --map-plan-label-road-major:#13181D; --map-plan-label-place:#3A444E; --map-plan-label-place-major:#13181D;
+  --map-plan-label-halo:#FFFFFF; --map-plan-label-water:#6B7680; --map-plan-poi:#6B7680; --map-plan-poi-green:#6B7680;
+  --map-plan-poi-blue:#6B7680;
+  --map-plan-building-3d-top:#E9EBED; --map-plan-glow:#FFFFFF; --map-plan-sky:#FFFFFF; --map-plan-haze:#FFFFFF;
+  --map-plan-light:#FFFFFF;
+  --map-plan-measure:#13181D; --map-plan-building-line:#B3BBC3;
+  /* neon: the website's look — black, glowing phosphor green */
+  --map-neon-bg:#050807; --map-neon-earth:#070B0A; --map-neon-water:#04110E; --map-neon-water-label:#1E8F6A; --map-neon-park:#08150F; --map-neon-wood:#08130E; --map-neon-scrub:#0A100D; --map-neon-sand:#0C100C; --map-neon-school:#0A0F0C; --map-neon-hospital:#0C0E0C; --map-neon-industrial:#090E0B; --map-neon-pedestrian:#0B110E; --map-neon-aerodrome:#0A0F0C; --map-neon-runway:#13221B; --map-neon-pier:#0F1914; --map-neon-building:#0C1511; --map-neon-building-3d:#0B1410; --map-neon-casing:#030504; --map-neon-tunnel:#0F1D17; --map-neon-road-other:#0F2A20; --map-neon-road-minor:#145C41; --map-neon-road-link:#1A9064; --map-neon-road-major:#1EC384; --map-neon-road-highway:#3CFFB0; --map-neon-rail:#123125; --map-neon-boundary:#1E6B50; --map-neon-label-road:#86EBC6; --map-neon-label-road-major:#D2FFEC; --map-neon-label-place:#8FDABD; --map-neon-label-place-major:#E8FFF5; --map-neon-label-halo:#030504; --map-neon-label-water:#2FA57E; --map-neon-poi:#5FBF9C; --map-neon-poi-green:#3CFFB0; --map-neon-poi-blue:#3CC8FF; --map-neon-building-3d-top:#1C3B2F; --map-neon-glow:#1EE39A; --map-neon-sky:#020403; --map-neon-haze:#0B1F17; --map-neon-light:#CFFFEA; --map-neon-measure:#FFB020; --map-neon-building-line:#14402F;
+  /* matrix: the Matrix look: pure black, traffic-light neon green, white measure line */
+  --map-matrix-bg:#000000; --map-matrix-earth:#020602; --map-matrix-water:#001408; --map-matrix-water-label:#00A83A; --map-matrix-park:#031208; --map-matrix-wood:#031008; --map-matrix-scrub:#040A05; --map-matrix-sand:#060A05; --map-matrix-school:#040904; --map-matrix-hospital:#060806; --map-matrix-industrial:#030803; --map-matrix-pedestrian:#050C06; --map-matrix-aerodrome:#040904; --map-matrix-runway:#0C1F10; --map-matrix-pier:#08140B; --map-matrix-building:#061009; --map-matrix-building-3d:#051007; --map-matrix-casing:#000000; --map-matrix-tunnel:#072010; --map-matrix-road-other:#08321A; --map-matrix-road-minor:#0E6B2C; --map-matrix-road-link:#12A23F; --map-matrix-road-major:#18C94C; --map-matrix-road-highway:#39FF6A; --map-matrix-rail:#0C3318; --map-matrix-boundary:#11702E; --map-matrix-label-road:#7DFF9E; --map-matrix-label-road-major:#D9FFE3; --map-matrix-label-place:#6FE08E; --map-matrix-label-place-major:#E6FFEC; --map-matrix-label-halo:#000000; --map-matrix-label-water:#19B34B; --map-matrix-poi:#3FBF66; --map-matrix-poi-green:#39FF6A; --map-matrix-poi-blue:#39FF6A; --map-matrix-building-3d-top:#1A4A26; --map-matrix-glow:#00FF41; --map-matrix-sky:#000200; --map-matrix-haze:#03180A; --map-matrix-light:#D9FFE3; --map-matrix-measure:#FFFFFF; --map-matrix-building-line:#0F3F1C;
+  /* ember: the Hermes look: black, ember red, amber measure line */
+  --map-ember-bg:#070303; --map-ember-earth:#0A0505; --map-ember-water:#0D0A10; --map-ember-water-label:#A55A5A; --map-ember-park:#0F0A07; --map-ember-wood:#0D0907; --map-ember-scrub:#0C0807; --map-ember-sand:#110C08; --map-ember-school:#0E0808; --map-ember-hospital:#120808; --map-ember-industrial:#0C0707; --map-ember-pedestrian:#110A0A; --map-ember-aerodrome:#0E0909; --map-ember-runway:#241414; --map-ember-pier:#1A0F0F; --map-ember-building:#170C0C; --map-ember-building-3d:#160B0B; --map-ember-casing:#030101; --map-ember-tunnel:#1E0E0E; --map-ember-road-other:#2E1212; --map-ember-road-minor:#8A2626; --map-ember-road-link:#B02A2A; --map-ember-road-major:#D93434; --map-ember-road-highway:#FF4A3D; --map-ember-rail:#2F1515; --map-ember-boundary:#7A3030; --map-ember-label-road:#FFB3A8; --map-ember-label-road-major:#FFF0EC; --map-ember-label-place:#E8A89E; --map-ember-label-place-major:#FFF4F1; --map-ember-label-halo:#030101; --map-ember-label-water:#B06A6A; --map-ember-poi:#C47A70; --map-ember-poi-green:#E0A458; --map-ember-poi-blue:#FF7A6E; --map-ember-building-3d-top:#4A1C1C; --map-ember-glow:#FF2D20; --map-ember-sky:#050101; --map-ember-haze:#1F0A08; --map-ember-light:#FFE6E0; --map-ember-measure:#FFD166; --map-ember-building-line:#3A1616;
+  /* cyber: cyberpunk: purple-black city, traffic-light roads (green freeways, amber main roads, red streets), cyan names */
+  --map-cyber-bg:#07040F; --map-cyber-earth:#0A0616; --map-cyber-water:#04122A; --map-cyber-water-label:#3FD8FF; --map-cyber-park:#061614; --map-cyber-wood:#061412; --map-cyber-scrub:#0C0A18; --map-cyber-sand:#120C1A; --map-cyber-school:#100A1E; --map-cyber-hospital:#160A1A; --map-cyber-industrial:#0C0818; --map-cyber-pedestrian:#120B22; --map-cyber-aerodrome:#0E0A1C; --map-cyber-runway:#22183A; --map-cyber-pier:#1A1230; --map-cyber-building:#160D2A; --map-cyber-building-3d:#1A0F33; --map-cyber-casing:#040209; --map-cyber-tunnel:#1C1238; --map-cyber-road-other:#2A1640; --map-cyber-road-minor:#C21E55; --map-cyber-road-link:#FFB000; --map-cyber-road-major:#FFB000; --map-cyber-road-highway:#39FF14; --map-cyber-rail:#3A2457; --map-cyber-boundary:#7A3FB0; --map-cyber-label-road:#7FF3FF; --map-cyber-label-road-major:#E6FDFF; --map-cyber-label-place:#C9A6FF; --map-cyber-label-place-major:#F4EDFF; --map-cyber-label-halo:#05020C; --map-cyber-label-water:#3FD8FF; --map-cyber-poi:#B58CFF; --map-cyber-poi-green:#39FF14; --map-cyber-poi-blue:#00E5FF; --map-cyber-building-3d-top:#5A2A9E; --map-cyber-glow:#FF2BD6; --map-cyber-sky:#05020C; --map-cyber-haze:#2A0C3F; --map-cyber-light:#F4EDFF; --map-cyber-measure:#00E5FF; --map-cyber-building-line:#3A1F66;
+  /* report: study figures: quiet greys so LOS, volume and crash colours stand out */
+  --map-report-bg:#F4F4F2; --map-report-earth:#F7F7F5; --map-report-water:#D3E1EB; --map-report-water-label:#5F7F96; --map-report-park:#E3EBDD; --map-report-wood:#DEE7D8; --map-report-scrub:#EEF1EA; --map-report-sand:#F1EFE8; --map-report-school:#F0EFF1; --map-report-hospital:#F3EEEE; --map-report-industrial:#EFEFEE; --map-report-pedestrian:#F2F2F0; --map-report-aerodrome:#EEEEEC; --map-report-runway:#DDDDDA; --map-report-pier:#E8E8E6; --map-report-building:#E4E4E1; --map-report-building-3d:#E4E4E1; --map-report-casing:#B9B9B6; --map-report-tunnel:#ECECEA; --map-report-road-other:#FFFFFF; --map-report-road-minor:#FFFFFF; --map-report-road-link:#FFFFFF; --map-report-road-major:#FFFFFF; --map-report-road-highway:#D9D9D6; --map-report-rail:#AEAEAB; --map-report-boundary:#8F8F8C; --map-report-label-road:#5E5E5B; --map-report-label-road-major:#2E2E2C; --map-report-label-place:#4A4A48; --map-report-label-place-major:#1E1E1D; --map-report-label-halo:#FFFFFF; --map-report-label-water:#5F7F96; --map-report-poi:#7A7A77; --map-report-poi-green:#7A7A77; --map-report-poi-blue:#7A7A77; --map-report-building-3d-top:#E4E4E1; --map-report-glow:#FFFFFF; --map-report-sky:#FFFFFF; --map-report-haze:#FFFFFF; --map-report-light:#FFFFFF; --map-report-measure:#1F5FAD; --map-report-building-line:#CFCFCB;
+  /* road details (src/layers/traffic.js): signal housing, lamps, signs, crosswalks, bike lanes, bus stops, lane labels */
+  --map-night-tc-signal:#1B2127; --map-night-tc-lamp-red:#FF4438; --map-night-tc-lamp-amber:#FFB020; --map-night-tc-lamp-green:#1EE39A; --map-night-tc-stop:#D7332A; --map-night-tc-white:#F4F5F7; --map-night-tc-crossing:#E9E4D4; --map-night-tc-bike:#3FBF7F; --map-night-tc-bus:#5AA2FF; --map-night-tc-label:#AEB9C3;
+  --map-day-tc-signal:#2B333B; --map-day-tc-lamp-red:#E5352B; --map-day-tc-lamp-amber:#F0A020; --map-day-tc-lamp-green:#13B67A; --map-day-tc-stop:#C4261B; --map-day-tc-white:#FFFFFF; --map-day-tc-crossing:#F4F5F7; --map-day-tc-bike:#2E9B62; --map-day-tc-bus:#1F5FAD; --map-day-tc-label:#57636F;
+  --map-plan-tc-signal:#13181D; --map-plan-tc-lamp-red:#E9EBED; --map-plan-tc-lamp-amber:#B3BBC3; --map-plan-tc-lamp-green:#6B7680; --map-plan-tc-stop:#13181D; --map-plan-tc-white:#FFFFFF; --map-plan-tc-crossing:#FFFFFF; --map-plan-tc-bike:#57636F; --map-plan-tc-bus:#3A444E; --map-plan-tc-label:#3A444E;
+  --map-neon-tc-signal:#0C1511; --map-neon-tc-lamp-red:#FF4438; --map-neon-tc-lamp-amber:#FFB020; --map-neon-tc-lamp-green:#3CFFB0; --map-neon-tc-stop:#E5352B; --map-neon-tc-white:#F4F5F7; --map-neon-tc-crossing:#D2FFEC; --map-neon-tc-bike:#FFB020; --map-neon-tc-bus:#3CC8FF; --map-neon-tc-label:#86EBC6;
+  --map-matrix-tc-signal:#061009; --map-matrix-tc-lamp-red:#FF3B30; --map-matrix-tc-lamp-amber:#FFB020; --map-matrix-tc-lamp-green:#39FF6A; --map-matrix-tc-stop:#E5352B; --map-matrix-tc-white:#D9FFE3; --map-matrix-tc-crossing:#D9FFE3; --map-matrix-tc-bike:#FFD166; --map-matrix-tc-bus:#5AC8FA; --map-matrix-tc-label:#7DFF9E;
+  --map-ember-tc-signal:#170C0C; --map-ember-tc-lamp-red:#FF4A3D; --map-ember-tc-lamp-amber:#FFD166; --map-ember-tc-lamp-green:#2FE38A; --map-ember-tc-stop:#E5352B; --map-ember-tc-white:#FFF0EC; --map-ember-tc-crossing:#FFE6E0; --map-ember-tc-bike:#3FBF7F; --map-ember-tc-bus:#5AA2FF; --map-ember-tc-label:#FFB3A8;
+  --map-cyber-tc-signal:#160D2A; --map-cyber-tc-lamp-red:#FF2B6A; --map-cyber-tc-lamp-amber:#FFB000; --map-cyber-tc-lamp-green:#39FF14; --map-cyber-tc-stop:#FF3B30; --map-cyber-tc-white:#F4EDFF; --map-cyber-tc-crossing:#E6FDFF; --map-cyber-tc-bike:#7CFFCB; --map-cyber-tc-bus:#C9A6FF; --map-cyber-tc-label:#7FF3FF;
+  --map-report-tc-signal:#2E2E2C; --map-report-tc-lamp-red:#E5352B; --map-report-tc-lamp-amber:#F0A020; --map-report-tc-lamp-green:#13B67A; --map-report-tc-stop:#C4261B; --map-report-tc-white:#FFFFFF; --map-report-tc-crossing:#FFFFFF; --map-report-tc-bike:#2E9B62; --map-report-tc-bus:#1F5FAD; --map-report-tc-label:#5E5E5B;
+  /* app overlay ramp (src/layers/overlays.js): one set for dark styles, one for light, so LOS and severity stay readable */
+  --map-night-ramp-1:#1EE39A; --map-night-ramp-2:#A6E35A; --map-night-ramp-3:#FFD23F; --map-night-ramp-4:#FFA62B; --map-night-ramp-5:#FF6A3D; --map-night-ramp-6:#FF3B5C;
+  --map-neon-ramp-1:#1EE39A; --map-neon-ramp-2:#A6E35A; --map-neon-ramp-3:#FFD23F; --map-neon-ramp-4:#FFA62B; --map-neon-ramp-5:#FF6A3D; --map-neon-ramp-6:#FF3B5C;
+  --map-matrix-ramp-1:#1EE39A; --map-matrix-ramp-2:#A6E35A; --map-matrix-ramp-3:#FFD23F; --map-matrix-ramp-4:#FFA62B; --map-matrix-ramp-5:#FF6A3D; --map-matrix-ramp-6:#FF3B5C;
+  --map-ember-ramp-1:#1EE39A; --map-ember-ramp-2:#A6E35A; --map-ember-ramp-3:#FFD23F; --map-ember-ramp-4:#FFA62B; --map-ember-ramp-5:#FF6A3D; --map-ember-ramp-6:#FF3B5C;
+  --map-cyber-ramp-1:#1EE39A; --map-cyber-ramp-2:#A6E35A; --map-cyber-ramp-3:#FFD23F; --map-cyber-ramp-4:#FFA62B; --map-cyber-ramp-5:#FF6A3D; --map-cyber-ramp-6:#FF3B5C;
+  --map-day-ramp-1:#0E9F63; --map-day-ramp-2:#6FAE2E; --map-day-ramp-3:#C9A100; --map-day-ramp-4:#E07B12; --map-day-ramp-5:#D2472A; --map-day-ramp-6:#A3122E;
+  --map-plan-ramp-1:#0E9F63; --map-plan-ramp-2:#6FAE2E; --map-plan-ramp-3:#C9A100; --map-plan-ramp-4:#E07B12; --map-plan-ramp-5:#D2472A; --map-plan-ramp-6:#A3122E;
+  --map-report-ramp-1:#0E9F63; --map-report-ramp-2:#6FAE2E; --map-report-ramp-3:#C9A100; --map-report-ramp-4:#E07B12; --map-report-ramp-5:#D2472A; --map-report-ramp-6:#A3122E;
+}

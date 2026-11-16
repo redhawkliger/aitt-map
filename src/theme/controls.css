@@ -1,0 +1,43 @@
+/* Map controls (zoom, compass, scale bar, credits) in Signal Flow. The map container carries
+   data-map-variant="night|day|plan"; night gets dark glass buttons, day and plan keep light ones. */
+.maplibregl-ctrl-group {
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button { width: 36px; height: 36px; }
+.maplibregl-ctrl-scale {
+  font: 600 11px var(--font-body, Overpass, system-ui, sans-serif);
+  border-radius: 0 0 4px 4px; padding: 1px 6px;
+}
+.maplibregl-ctrl-attrib { font: 400 11px var(--font-body, Overpass, system-ui, sans-serif); }
+
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-group {
+  background: rgba(21, 26, 31, 0.82) !important;          /* --surface #151A1F as glass */
+  backdrop-filter: blur(8px);
+  border: 1px solid #29323B;                              /* --line */
+}
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-group button + button { border-top: 1px solid #29323B; }
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-group button:hover { background: rgba(230, 234, 238, 0.08) !important; }
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-icon { filter: invert(0.88); }
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-scale {
+  background: rgba(21, 26, 31, 0.82); color: #C2CBD3; border-color: #8E9AA6;
+}
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-attrib {
+  background: rgba(11, 14, 17, 0.7) !important; color: #8E9AA6;
+}
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .maplibregl-ctrl-attrib a { color: #C2CBD3; }
+
+/* Demo "Go to" list (top centre). */
+.aitt-goto { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 5; }
+.aitt-goto select {
+  font: 600 13px var(--font-body, Overpass, system-ui, sans-serif); padding: 8px 12px; border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92); color: #13181D; border: 1px solid #D3D8DD; cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+}
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .aitt-goto select { background: rgba(21, 26, 31, 0.86); color: #E6EAEE; border-color: #29323B; }
+@media (max-width: 640px) { .aitt-goto { left: auto; right: 58px; transform: none; } }
+[data-map-variant="neon"] .maplibregl-ctrl-group, [data-map-variant="neon"] .aitt-goto select { background: rgba(5, 12, 9, 0.86) !important; border-color: #14402F; }
+[data-map-variant="matrix"] .maplibregl-ctrl-group, [data-map-variant="matrix"] .aitt-goto select { background: rgba(0, 6, 2, 0.88) !important; border-color: #0F3F1C; }
+[data-map-variant="ember"] .maplibregl-ctrl-group, [data-map-variant="ember"] .aitt-goto select { background: rgba(12, 5, 5, 0.88) !important; border-color: #3A1616; }
+[data-map-variant="cyber"] .maplibregl-ctrl-group, [data-map-variant="cyber"] .aitt-goto select { background: rgba(10, 6, 22, 0.86) !important; border-color: #3A1F66; }

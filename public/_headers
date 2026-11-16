@@ -1,0 +1,7 @@
+# Security headers for Cloudflare Pages (the local preview sends the same ones; see vite.config.js).
+# Map data comes from our R2 bucket; the Satellite layer's statewide imagery from the USGS National Map.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://basemap.nationalmap.gov; connect-src 'self' https://tiles.aitransportationtools.com https://*.r2.dev https://basemap.nationalmap.gov; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self' https://aitransportationtools.com https://www.aitransportationtools.com
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

@@ -1,0 +1,108 @@
+# Traffic-control layer for California, built from OpenStreetMap with Planetiler:
+#   java -jar planetiler.jar generate-custom --schema=schema/traffic.yml --osm_path=<california.osm.pbf> \
+#        --output=data/traffic.pmtiles
+# (scripts/get-traffic.mjs runs this.) What a traffic engineer looks for at an intersection that generic basemaps drop:
+# how it is controlled, how wide the street is, how fast, and where people on foot, bikes and buses are.
+schema_name: AITT traffic control
+schema_description: Signals, stop and yield signs, crosswalks, lanes, speed limits, bike lanes and bus stops (California)
+attribution: <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>
+is_overlay: true
+args:
+  osm_path:
+    description: Local OSM extract
+    default: ../../data/osm/california-latest.osm.pbf
+  minzoom: 12
+  maxzoom: 15
+sources:
+  osm:
+    type: osm
+    local_path: '${ args.osm_path }'
+tag_mappings:
+  lanes: integer
+  lanes:forward: integer
+  lanes:backward: integer
+layers:
+  # Points at intersections and mid-block.
+  - id: control
+    features:
+      - source: osm
+        geometry: point
+        min_zoom: 14
+        include_when:
+          highway: [traffic_signals, stop, give_way, crossing, mini_roundabout]
+          railway: [level_crossing, crossing]
+        attributes:
+          - key: kind
+            coalesce: ['${ feature.tags.highway }', '${ feature.tags.railway }']
+          - key: crossing
+            tag_value: crossing
+          - key: markings
+            tag_value: crossing:markings
+          - key: signals
+            tag_value: crossing:signals
+          - key: stop
+            tag_value: stop
+          - key: direction
+            tag_value: direction
+  # Streets with what is known about them: lanes, speed, one-way, bike facilities.
+  - id: streets
+    features:
+      - source: osm
+        geometry: line
+        min_zoom: 12
+        # Only streets that carry something the apps use (the basemap already draws every street and its name).
+        # Leaving out bare pieces (most driveways and parking aisles) keeps the file under R2's 300 MB one-shot upload.
+        include_when:
+          __all__:
+            - highway: [motorway, trunk, primary, secondary, tertiary, motorway_link, trunk_link, primary_link,
+                secondary_link, tertiary_link, unclassified, residential, living_street, service, cycleway]
+            - __any__:
+                highway: cycleway
+                lanes: __any__
+                lanes:forward: __any__
+                lanes:backward: __any__
+                turn:lanes: __any__
+                maxspeed: __any__
+                oneway: ['yes', '-1']
+                cycleway: __any__
+                cycleway:both: __any__
+                cycleway:left: __any__
+                cycleway:right: __any__
+                sidewalk: __any__
+        attributes:
+          - key: highway
+            tag_value: highway
+          - key: name
+            tag_value: name
+          - key: lanes
+            tag_value: lanes
+            type: integer
+          - key: lanes_fwd
+            tag_value: lanes:forward
+            type: integer
+          - key: lanes_bwd
+            tag_value: lanes:backward
+            type: integer
+          - key: turn_lanes
+            tag_value: turn:lanes
+          - key: maxspeed
+            tag_value: maxspeed
+          - key: oneway
+            tag_value: oneway
+          - key: cycleway
+            coalesce: ['${ feature.tags["cycleway:both"] }', '${ feature.tags["cycleway:right"] }',
+              '${ feature.tags.cycleway }', '${ feature.tags["cycleway:left"] }']
+          - key: sidewalk
+            tag_value: sidewalk
+  - id: transit
+    features:
+      - source: osm
+        geometry: point
+        min_zoom: 15
+        include_when:
+          highway: bus_stop
+        attributes:
+          - key: name
+            tag_value: name
+          - key: shelter
+            tag_value: shelter

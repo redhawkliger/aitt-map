@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "aitt-map",
+  "compatibility_date": "2026-11-13",
+  // The public address. The workers.dev address stays on as well.
+  "routes": [{ "pattern": "map.aitransportationtools.com", "custom_domain": true }],
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

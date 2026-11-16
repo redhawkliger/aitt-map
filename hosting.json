@@ -1,0 +1,7 @@
+{
+  "basemapUrl": "https://tiles.aitransportationtools.com/basemap/v20261114.pmtiles",
+  "roadDetailsUrl": "https://tiles.aitransportationtools.com/layers/road-details-v20261116.pmtiles",
+  "glyphs": "https://tiles.aitransportationtools.com/fonts/{fontstack}/{range}.pbf",
+  "build": "20261114",
+  "uploaded": "2026-11-16T22:27:25.538Z"
+}

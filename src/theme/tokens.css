@@ -1,0 +1,31 @@
+/* Signal Flow — asphalt surfaces, signal-lamp accents, Highway-Gothic-style type.
+   Layout: content on a quiet grid; live traffic simulation is the only loud element. */
+:root {
+  --bg: #ECEEF0; --surface: #FFFFFF; --surface-2: #F4F5F7; --line: #D3D8DD;
+  --fg: #13181D; --muted: #57636F; --on-go: #FFFFFF;
+  --go: #07864F; --amber: #9E6400; --stop: #C4261B; --info: #1F5FAD;
+  --los-a: #07864F; --los-b: #3D8F2E; --los-c: #7A7F0E; --los-d: #9E6400; --los-e: #B8481A; --los-f: #C4261B;
+  /* road + lamps: identical in both themes (a road is a road) */
+  --road: #22282E; --road-verge: #171B1F; --paint: #E9E4D4; --paint-yellow: #F2C230; --car: #B9C3CC;
+  --lamp-go: #1EE39A; --lamp-amber: #FFB020; --lamp-stop: #FF4438; --lamp-off: #2A3138;
+  --font-display: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Overpass", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Overpass Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1013; --surface: #151A1F; --surface-2: #1B2127; --line: #29323B;
+    --fg: #E6EAEE; --muted: #8E9AA6; --on-go: #04140C;
+    --go: #1EE39A; --amber: #FFB020; --stop: #FF5A4E; --info: #5AA2FF;
+    --los-a: #1EE39A; --los-b: #7FD957; --los-c: #D2D63A; --los-d: #FFB020; --los-e: #FF8A3D; --los-f: #FF5A4E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1013; --surface: #151A1F; --surface-2: #1B2127; --line: #29323B;
+  --fg: #E6EAEE; --muted: #8E9AA6; --on-go: #04140C;
+  --go: #1EE39A; --amber: #FFB020; --stop: #FF5A4E; --info: #5AA2FF;
+  --los-a: #1EE39A; --los-b: #7FD957; --los-c: #D2D63A; --los-d: #FFB020; --los-e: #FF8A3D; --los-f: #FF5A4E;
+  color-scheme: dark;
+}

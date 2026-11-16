@@ -1,0 +1,55 @@
+/* The layer panel, Signal Flow. Dark glass on night, light card on day/plan. */
+.aitt-layer-panel {
+  position: absolute; top: 10px; left: 10px; z-index: 5; width: 232px;
+  font: 500 13px var(--font-body, Overpass, system-ui, sans-serif);
+  --p-bg: rgba(255, 255, 255, 0.92); --p-fg: #13181D; --p-muted: #57636F; --p-line: #D3D8DD; --p-on: #1F5FAD;
+  color: var(--p-fg);
+}
+:is([data-map-variant="night"], [data-map-variant="neon"], [data-map-variant="matrix"], [data-map-variant="ember"], [data-map-variant="cyber"]) .aitt-layer-panel {
+  --p-bg: rgba(21, 26, 31, 0.84); --p-fg: #E6EAEE; --p-muted: #8E9AA6; --p-line: #29323B; --p-on: #5AA2FF;
+}
+.aitt-layer-body, .aitt-layer-toggle {
+  background: var(--p-bg); border: 1px solid var(--p-line); border-radius: 12px;
+  backdrop-filter: blur(10px); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+}
+.aitt-layer-body { padding: 10px 12px; display: grid; gap: 12px; }
+.aitt-layer-toggle { display: none; color: var(--p-fg); font: inherit; font-weight: 600; padding: 9px 14px; cursor: pointer; }
+.aitt-layer-group { display: grid; gap: 6px; }
+.aitt-layer-group-name { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-muted); }
+.aitt-layer-row { display: grid; gap: 4px; }
+.aitt-layer-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; min-height: 28px; }
+
+.aitt-switch {
+  appearance: none; width: 34px; height: 20px; border-radius: 10px; margin: 0; cursor: pointer; flex: none;
+  background: var(--p-line); position: relative; transition: background 0.15s;
+}
+.aitt-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; transition: transform 0.15s; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+.aitt-switch:checked { background: var(--p-on); }
+.aitt-switch:checked::after { transform: translateX(14px); }
+.aitt-switch:focus-visible, .aitt-seg-btn:focus-visible { outline: 2px solid var(--p-on); outline-offset: 2px; }
+
+.aitt-opacity { width: 100%; accent-color: var(--p-on); height: 16px; margin: 0; }
+.aitt-slider { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 8px; font-size: 11.5px; color: var(--p-muted); }
+
+.aitt-seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--p-line); border-radius: 8px; padding: 2px; gap: 2px; }
+.aitt-seg-btn {
+  font: inherit; font-size: 12px; font-weight: 600; color: var(--p-muted); background: transparent;
+  border: 0; border-radius: 6px; padding: 5px 0; cursor: pointer;
+}
+.aitt-seg-btn[aria-checked="true"] { background: var(--p-bg); color: var(--p-fg); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+
+@media (max-width: 640px) {
+  .aitt-layer-panel { width: auto; max-width: calc(100vw - 80px); }
+  .aitt-layer-toggle { display: block; }
+  .aitt-layer-body { display: none; margin-top: 6px; }
+  .aitt-layer-panel.is-open .aitt-layer-body { display: grid; min-width: 220px; }
+}
+/* Neon: the website's green accent and green-tinted glass. */
+[data-map-variant="neon"] .aitt-layer-panel { --p-bg: rgba(5, 12, 9, 0.86); --p-line: #14402F; --p-on: #1EE39A; --p-muted: #6FBF9F; }
+/* Matrix green, Ember red, Cyber magenta. */
+[data-map-variant="matrix"] .aitt-layer-panel { --p-bg: rgba(0, 6, 2, 0.88); --p-line: #0F3F1C; --p-on: #39FF6A; --p-muted: #5FCF7E; }
+[data-map-variant="ember"] .aitt-layer-panel { --p-bg: rgba(12, 5, 5, 0.88); --p-line: #3A1616; --p-on: #FF4A3D; --p-muted: #C98A82; }
+[data-map-variant="cyber"] .aitt-layer-panel { --p-bg: rgba(10, 6, 22, 0.86); --p-line: #3A1F66; --p-on: #FF2BD6; --p-muted: #A98BE0; }
