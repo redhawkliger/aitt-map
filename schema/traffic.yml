@@ -50,9 +50,25 @@ layers:
       - source: osm
         geometry: line
         min_zoom: 12
+        # Only streets that carry something the apps use (the basemap already draws every street and its name).
+        # Leaving out bare pieces (most driveways and parking aisles) keeps the file under R2's 300 MB one-shot upload.
         include_when:
-          highway: [motorway, trunk, primary, secondary, tertiary, motorway_link, trunk_link, primary_link,
-            secondary_link, tertiary_link, unclassified, residential, living_street, service, cycleway]
+          __all__:
+            - highway: [motorway, trunk, primary, secondary, tertiary, motorway_link, trunk_link, primary_link,
+                secondary_link, tertiary_link, unclassified, residential, living_street, service, cycleway]
+            - __any__:
+                highway: cycleway
+                lanes: __any__
+                lanes:forward: __any__
+                lanes:backward: __any__
+                turn:lanes: __any__
+                maxspeed: __any__
+                oneway: ['yes', '-1']
+                cycleway: __any__
+                cycleway:both: __any__
+                cycleway:left: __any__
+                cycleway:right: __any__
+                sidewalk: __any__
         attributes:
           - key: highway
             tag_value: highway

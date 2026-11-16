@@ -1,17 +1,7 @@
 {
   "basemapUrl": "https://tiles.aitransportationtools.com/basemap/v20261114.pmtiles",
-  "photosUrls": [
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/alameda-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/contra-costa-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/marin-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/napa-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/san-francisco-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/san-mateo-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/santa-clara-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/solano-county-ca.pmtiles",
-    "https://tiles.aitransportationtools.com/imagery/naip-2024/sonoma-county-ca.pmtiles"
-  ],
+  "roadDetailsUrl": "https://tiles.aitransportationtools.com/layers/road-details-v20261116.pmtiles",
   "glyphs": "https://tiles.aitransportationtools.com/fonts/{fontstack}/{range}.pbf",
   "build": "20261114",
-  "uploaded": "2026-11-16T17:28:28.984Z"
+  "uploaded": "2026-11-16T22:27:25.538Z"
 }

@@ -6,15 +6,16 @@ Two free Cloudflare services:
 
 - **Map files**: **R2** storage, bucket `aitt-map`, served at `tiles.aitransportationtools.com`.
   - The basemap (1.5 GB).
-  - The crisp 2024 aerial photos, one file per Bay Area county (3.3 GB), under `imagery/naip-2024/`.
+  - Road details, under `layers/road-details-v<date>.pmtiles` (135 MB): signals, signs, crosswalks, lanes, speed limits, bike lanes and bus stops, built by `npm run traffic`.
   - The label fonts.
+  - The old aerial photos (3.3 GB, `imagery/naip-2024/`). Satellite was dropped on 2026-11-16, so the map no longer uses them.
 - **Demo page**: a **Worker** with static assets, named `aitt-map`, at `map.aitransportationtools.com`. The settings are in `wrangler.jsonc`.
 
 The map files and the demo page need different addresses, because one hostname can't point at both an R2 bucket and a Worker.
 
 **What it costs:** $0 at our size.
 - **R2 free tier:**
-  - 10 GB of storage; we use about 4.8 GB.
+  - 10 GB of storage; we use about 5 GB (about 1.7 GB without the old photos).
   - 10 million reads a month.
   - Downloads (egress) are always free.
 - **Workers static assets:** free.
@@ -79,7 +80,15 @@ npm.cmd run upload
 
 The first upload took about an hour (1034 files, 4.8 GB). You can run it again at any time: files already in the bucket with the same size are skipped.
 
-When it finishes, it prints `wrote hosting.json`. That file holds only public addresses, no keys, and is committed. To upload more county photos, run `projects/naip-store` to build them into `data/naip/`, then run the upload again.
+When it finishes, it prints `wrote hosting.json`. That file holds only public addresses, no keys, and is committed.
+
+**Files under 300 MB need no keys.** Wrangler's sign-in can upload them one at a time, which is how the road details went up on 2026-11-16. Edit `hosting.json` by hand afterwards.
+
+```powershell
+npx.cmd wrangler r2 object put aitt-map/layers/road-details-v20261116.pmtiles --file data/traffic.pmtiles --remote --content-type application/octet-stream --cache-control "public, max-age=31536000, immutable"
+```
+
+**Rebuilding road details:** `$env:JAVA = 'C:\Users\aksha\Workspace\tools\java\jdk-21.0.13+9-jre\bin\java.exe'; node scripts/get-traffic.mjs C:/Users/aksha/Workspace/data/osm/california-latest.osm.pbf` takes about a minute. Upload the result under a new date and point `roadDetailsUrl` at it.
 
 **Rollback:** each basemap goes up under its build date (`basemap/v20261114.pmtiles`). To go back, point `basemapUrl` in `hosting.json` at an older one and redeploy.
 
