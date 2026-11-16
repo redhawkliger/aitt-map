@@ -25,11 +25,21 @@ export function standInStyle(basemapUrl) {
 }
 
 /**
+ * How the map responds to the hand. One wheel notch at the stock rate (1/450) zooms 0.15 of a level, which feels
+ * sluggish; 1/100 gives about half a level. Apps can pass their own values to createMap({feel}).
+ */
+export const FEEL = { wheelZoomRate: 1 / 100, trackpadZoomRate: 1 / 70, fadeDuration: 120 };
+
+/**
  * @param {{container: HTMLElement, basemapUrl: string, style?: object|((url:string)=>object),
- *          center?: [number,number], zoom?: number}} opts
+ *          center?: [number,number], zoom?: number, feel?: Partial<typeof FEEL>, hash?: boolean,
+ *          controls?: boolean}} opts
+ *        hash: keep the view in the web address (#zoom/lat/lon) so a link opens the same place.
+ *        controls: zoom buttons, a compass that resets north, and a scale bar in feet/miles (default true).
  * @returns {Promise<maplibregl.Map>}
  */
-export async function createMap({ container, basemapUrl, style, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM }) {
+export async function createMap({ container, basemapUrl, style, center = DEFAULT_CENTER, zoom = DEFAULT_ZOOM,
+  feel = {}, hash = false, controls = true }) {
   if (!hasWebGL()) {
     showMessage(container, "This browser can't draw the map (WebGL is off)");
     return null;
@@ -37,7 +47,15 @@ export async function createMap({ container, basemapUrl, style, center = DEFAULT
   addProtocol();
   const absolute = new URL(basemapUrl, location.href).href;
   const s = typeof style === 'function' ? style(absolute) : style ?? standInStyle(absolute);
-  const map = new maplibregl.Map({ container, style: s, center, zoom, attributionControl: { compact: false } });
+  const f = { ...FEEL, ...feel };
+  const map = new maplibregl.Map({ container, style: s, center, zoom, hash, fadeDuration: f.fadeDuration,
+    attributionControl: { compact: false } });
+  map.scrollZoom.setWheelZoomRate(f.wheelZoomRate);
+  map.scrollZoom.setZoomRate(f.trackpadZoomRate);
+  if (controls) {
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+    map.addControl(new maplibregl.ScaleControl({ unit: 'imperial', maxWidth: 120 }), 'bottom-left');
+  }
   // A basemap that can't be read (PC asleep, wrong URL) shows a plain message, never a blank map or a stack trace.
   map.on('error', (e) => {
     if (e.sourceId === 'basemap' || /pmtiles|basemap|404|Failed to fetch/i.test(e.error?.message ?? '')) {

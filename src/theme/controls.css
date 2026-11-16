@@ -1,0 +1,29 @@
+/* Map controls (zoom, compass, scale bar, credits) in Signal Flow. The map container carries
+   data-map-variant="night|day|plan"; night gets dark glass buttons, day and plan keep light ones. */
+.maplibregl-ctrl-group {
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button { width: 36px; height: 36px; }
+.maplibregl-ctrl-scale {
+  font: 600 11px var(--font-body, Overpass, system-ui, sans-serif);
+  border-radius: 0 0 4px 4px; padding: 1px 6px;
+}
+.maplibregl-ctrl-attrib { font: 400 11px var(--font-body, Overpass, system-ui, sans-serif); }
+
+[data-map-variant="night"] .maplibregl-ctrl-group {
+  background: rgba(21, 26, 31, 0.82) !important;          /* --surface #151A1F as glass */
+  backdrop-filter: blur(8px);
+  border: 1px solid #29323B;                              /* --line */
+}
+[data-map-variant="night"] .maplibregl-ctrl-group button + button { border-top: 1px solid #29323B; }
+[data-map-variant="night"] .maplibregl-ctrl-group button:hover { background: rgba(230, 234, 238, 0.08) !important; }
+[data-map-variant="night"] .maplibregl-ctrl-icon { filter: invert(0.88); }
+[data-map-variant="night"] .maplibregl-ctrl-scale {
+  background: rgba(21, 26, 31, 0.82); color: #C2CBD3; border-color: #8E9AA6;
+}
+[data-map-variant="night"] .maplibregl-ctrl-attrib {
+  background: rgba(11, 14, 17, 0.7) !important; color: #8E9AA6;
+}
+[data-map-variant="night"] .maplibregl-ctrl-attrib a { color: #C2CBD3; }
