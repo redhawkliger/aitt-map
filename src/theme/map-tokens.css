@@ -3,33 +3,33 @@
    Signal colours (go / amber / stop) are not used here: on a map they are kept for results that mean something. */
 :root {
   /* night */
-  --map-night-bg:#0B0E11; --map-night-earth:#101418; --map-night-water:#0C1A24; --map-night-water-label:#5D8BA8;
+  --map-night-bg:#0F1318; --map-night-earth:#14191F; --map-night-water:#0C1A24; --map-night-water-label:#5D8BA8;
   --map-night-park:#0E1D17; --map-night-wood:#0F1A15; --map-night-scrub:#12171A; --map-night-sand:#1A1A17;
   --map-night-school:#15171C; --map-night-hospital:#1A1517; --map-night-industrial:#13161A;
   --map-night-pedestrian:#161B20; --map-night-aerodrome:#14181C; --map-night-runway:#22282E; --map-night-pier:#1B2127;
-  --map-night-building:#151A1F; --map-night-building-3d:#141A20; --map-night-casing:#0B0E11; --map-night-tunnel:#1B2127;
-  --map-night-road-other:#20272E; --map-night-road-minor:#2F3841; --map-night-road-link:#4A5560;
-  --map-night-road-major:#5C6875; --map-night-road-highway:#8C7A4A; --map-night-rail:#2A3138;
+  --map-night-building:#242C35; --map-night-building-3d:#222A33; --map-night-casing:#0A0D10; --map-night-tunnel:#1B2127;
+  --map-night-road-other:#2C343D; --map-night-road-minor:#46515D; --map-night-road-link:#5F6B78;
+  --map-night-road-major:#626F7C; --map-night-road-highway:#B39752; --map-night-rail:#2A3138;
   --map-night-boundary:#57636F; --map-night-label-road:#C2CBD3; --map-night-label-road-major:#EEF1F4;
-  --map-night-label-place:#A7B2BC; --map-night-label-place-major:#E6EAEE; --map-night-label-halo:#0B0E11;
+  --map-night-label-place:#A7B2BC; --map-night-label-place-major:#E6EAEE; --map-night-label-halo:#0A0D10;
   --map-night-label-water:#5D8BA8; --map-night-poi:#8E9AA6; --map-night-poi-green:#4FA37A; --map-night-poi-blue:#6F9BD1;
-  --map-night-building-3d-top:#3A4652; --map-night-glow:#C9A24A; --map-night-sky:#06080A; --map-night-haze:#1A2129;
+  --map-night-building-3d-top:#4A5867; --map-night-glow:#D4AE55; --map-night-sky:#06080A; --map-night-haze:#1A2129;
   --map-night-light:#E6EAEE;
-  --map-night-measure:#5AA2FF;
+  --map-night-measure:#5AA2FF; --map-night-building-line:#36414C;
   /* day */
-  --map-day-bg:#ECEEF0; --map-day-earth:#F4F5F7; --map-day-water:#C9DCEB; --map-day-water-label:#3F6E91;
-  --map-day-park:#D8EAD9; --map-day-wood:#D2E4D3; --map-day-scrub:#E6ECE4; --map-day-sand:#EFEAD9;
+  --map-day-bg:#ECEEF0; --map-day-earth:#F4F5F7; --map-day-water:#A9CDEE; --map-day-water-label:#2E6A9C;
+  --map-day-park:#C8E7CA; --map-day-wood:#BEDDC1; --map-day-scrub:#E1EDDC; --map-day-sand:#EFEAD9;
   --map-day-school:#ECE9F1; --map-day-hospital:#F3E6E8; --map-day-industrial:#E8E9EC; --map-day-pedestrian:#F0F1F3;
-  --map-day-aerodrome:#E6E8EC; --map-day-runway:#D3D8DD; --map-day-pier:#E1E4E8; --map-day-building:#DDE1E6;
+  --map-day-aerodrome:#E6E8EC; --map-day-runway:#D3D8DD; --map-day-pier:#E1E4E8; --map-day-building:#E3E6EA;
   --map-day-building-3d:#D3D8DD; --map-day-casing:#C2C9D0; --map-day-tunnel:#E4E7EA; --map-day-road-other:#FFFFFF;
   --map-day-road-minor:#FFFFFF; --map-day-road-link:#FFFFFF; --map-day-road-major:#FFFFFF;
   --map-day-road-highway:#F2D58A; --map-day-rail:#B3BBC3; --map-day-boundary:#8E9AA6; --map-day-label-road:#57636F;
   --map-day-label-road-major:#2B333B; --map-day-label-place:#3A444E; --map-day-label-place-major:#13181D;
-  --map-day-label-halo:#FFFFFF; --map-day-label-water:#3F6E91; --map-day-poi:#57636F; --map-day-poi-green:#3E8A5F;
+  --map-day-label-halo:#FFFFFF; --map-day-label-water:#2E6A9C; --map-day-poi:#57636F; --map-day-poi-green:#3E8A5F;
   --map-day-poi-blue:#1F5FAD;
   --map-day-building-3d-top:#C2C9D0; --map-day-glow:#F2D58A; --map-day-sky:#DCE6F0; --map-day-haze:#ECEEF0;
   --map-day-light:#FFFFFF;
-  --map-day-measure:#1F5FAD;
+  --map-day-measure:#1F5FAD; --map-day-building-line:#C9CFD6;
   /* plan */
   --map-plan-bg:#FFFFFF; --map-plan-earth:#FFFFFF; --map-plan-water:#E3E8ED; --map-plan-water-label:#6B7680;
   --map-plan-park:#F1F3F1; --map-plan-wood:#F1F3F1; --map-plan-scrub:#F7F8F7; --map-plan-sand:#F7F7F4;
@@ -43,5 +43,5 @@
   --map-plan-poi-blue:#6B7680;
   --map-plan-building-3d-top:#E9EBED; --map-plan-glow:#FFFFFF; --map-plan-sky:#FFFFFF; --map-plan-haze:#FFFFFF;
   --map-plan-light:#FFFFFF;
-  --map-plan-measure:#13181D;
+  --map-plan-measure:#13181D; --map-plan-building-line:#B3BBC3;
 }

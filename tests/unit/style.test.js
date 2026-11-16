@@ -147,3 +147,47 @@ it('street names win over shop names when they collide (drawn above, so placed f
   expect(idx('roads_labels_minor')).toBeGreaterThan(idx('pois'));
   expect(idx('roads_labels_major')).toBeGreaterThan(idx('pois'));
 });
+
+// Clarity: roads must stand out from the ground, streets must be wide enough to read, buildings need edges.
+import { layers as pmLayers, namedFlavor } from '@protomaps/basemaps';
+function zoomValue(expr, z) {
+  if (typeof expr === 'number') return expr;
+  if (!Array.isArray(expr) || expr[0] !== 'interpolate') return NaN;
+  const stops = expr.slice(3); const base = expr[1][0] === 'exponential' ? expr[1][1] : 1;
+  if (z <= stops[0]) return stops[1];
+  for (let i = 0; i < stops.length - 2; i += 2) {
+    const [z0, v0, z1, v1] = stops.slice(i, i + 4);
+    if (z <= z1) {
+      const t = base === 1 ? (z - z0) / (z1 - z0) : (base ** (z - z0) - 1) / (base ** (z1 - z0) - 1);
+      return v0 + (v1 - v0) * t;
+    }
+  }
+  return stops[stops.length - 1];
+}
+describe('the map reads clearly', () => {
+  const tokens = fakeTokens();
+  const stock = Object.fromEntries(pmLayers('basemap', namedFlavor('dark'), { lang: 'en' }).map((l) => [l.id, l]));
+  for (const id of ['roads_minor', 'roads_major', 'roads_highway']) {
+    it(`${id} is at least 1.4x the stock width at zoom 16`, () => {
+      const l = buildStyle(tokens, 'night', OPTS).layers.find((x) => x.id === id);
+      expect(zoomValue(l.paint['line-width'], 16)).toBeGreaterThanOrEqual(1.4 * zoomValue(stock[id].paint['line-width'], 16) - 1e-9);
+    });
+  }
+  for (const v of VARIANTS) {
+    it(`${v}: buildings have a crisp outline from a token`, () => {
+      const l = buildStyle(tokens, v, OPTS).layers.find((x) => x.id === 'buildings_outline');
+      expect(l?.type).toBe('line');
+      expect(l.paint['line-color']).toBe(tokens[`--map-${v}-building-line`]);
+    });
+  }
+  it('night streets stand out from the ground (contrast 2:1 minor, 3:1 major)', () => {
+    const t = cssTokens();
+    expect(contrast(t['--map-night-road-minor'], t['--map-night-earth'])).toBeGreaterThanOrEqual(2);
+    expect(contrast(t['--map-night-road-major'], t['--map-night-earth'])).toBeGreaterThanOrEqual(3);
+    expect(contrast(t['--map-night-building'], t['--map-night-earth'])).toBeGreaterThanOrEqual(1.25);
+  });
+  it('day streets have a visible edge against the ground', () => {
+    const t = cssTokens();
+    expect(contrast(t['--map-day-casing'], t['--map-day-earth'])).toBeGreaterThanOrEqual(1.5);
+  });
+});

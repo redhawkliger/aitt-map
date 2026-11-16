@@ -10,6 +10,8 @@ export const MAP_SLOTS = [
   'building-3d-top', 'glow', 'sky', 'haze', 'light',
   // measure tool line
   'measure',
+  // building edges
+  'building-line',
 ];
 
 // Protomaps flavor key → our slot. First match wins. An unknown key throws, so a basemaps upgrade that adds a
@@ -77,6 +79,23 @@ function readableLabels(l) {
   return l;
 }
 
+// Roads: the stock Protomaps widths are drawn for a light, busy map; on ours they read as hairlines. Every road and
+// casing width is scaled up, keeping the stock curve across zooms.
+const ROAD_WIDTH = 1.45;
+function scaleStops(expr, k) {
+  if (typeof expr === 'number') return expr * k;
+  if (Array.isArray(expr) && expr[0] === 'interpolate') {
+    return [...expr.slice(0, 3), ...expr.slice(3).map((v, i) => (i % 2 === 1 && typeof v === 'number' ? v * k : v))];
+  }
+  return expr;
+}
+function widerRoads(l) {
+  if (l.type !== 'line' || l['source-layer'] !== 'roads' || !l.paint) return l;
+  const paint = { ...l.paint };
+  for (const p of ['line-width', 'line-gap-width']) if (paint[p] !== undefined) paint[p] = scaleStops(paint[p], ROAD_WIDTH);
+  return { ...l, paint };
+}
+
 /**
  * The MapLibre style for one variant; every colour comes from the tokens.
  * @param {Record<string,string>} tokens  from readTokens()
@@ -94,7 +113,13 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
   const origin = globalThis.location?.origin ?? 'http://localhost';
   let ls = layers('basemap', flavorFrom(t), { lang: 'en' }).map((l) =>
     l.layout?.['text-font'] ? { ...l, layout: { ...l.layout, 'text-font': swapFonts(l.layout['text-font']) } } : l);
-  ls = ls.map(readableLabels);
+  ls = ls.map(readableLabels).map(widerRoads);
+  // Crisp building edges, like the big maps: a hairline around every footprint from z15.
+  const bAt = ls.findIndex((l) => l.id === 'buildings');
+  if (bAt > -1) {
+    ls.splice(bAt + 1, 0, { id: 'buildings_outline', type: 'line', source: 'basemap', 'source-layer': 'buildings', minzoom: 15,
+      paint: { 'line-color': t('building-line'), 'line-width': ['interpolate', ['linear'], ['zoom'], 15, 0.5, 18, 1.1] } });
+  }
   // MapLibre places symbols from the top layer down, so moving street names above the POIs lets them win a collision.
   const streetNames = ls.filter((l) => ROAD_LABEL[l.id]);
   const poiAt = ls.findIndex((l) => l.id === 'pois');
