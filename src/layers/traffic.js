@@ -116,10 +116,11 @@ export function trafficLayer(tokens, variant, url) {
   const SRC = 'traffic';
   const bikeTrack = ['any', ['==', ['get', 'highway'], 'cycleway'], ['in', ['get', 'cycleway'], ['literal', ['track', 'separate']]]];
   const bikeLane = ['in', ['get', 'cycleway'], ['literal', ['lane', 'buffered_lane', 'shared_lane', 'share_busway']]];
-  const lanes = ['to-string', ['get', 'lanes']];
+  const lanes = ['concat', ['to-string', ['get', 'lanes']], ['case', ['==', ['get', 'lanes'], 1], ' lane', ' lanes']];
   return {
     id: SRC, name: 'Traffic control', group: 'data', visible: true, opacity: 1,
-    source: { type: 'vector', url, attribution: '© OpenStreetMap contributors' },
+    // No attribution here: the basemap already credits OpenStreetMap, and MapLibre would list it twice.
+    source: { type: 'vector', url },
     layers: [
       { id: 'traffic-bike', type: 'line', source: SRC, 'source-layer': 'streets', minzoom: 13, filter: bikeTrack,
         layout: { 'line-cap': 'round', 'line-join': 'round' },
@@ -136,8 +137,8 @@ export function trafficLayer(tokens, variant, url) {
           'text-size': ['interpolate', ['linear'], ['zoom'], 16, 10.5, 19, 13],
           'text-offset': [0, 1.15], 'text-letter-spacing': 0.02,
           'text-field': ['case',
-            ['all', ['has', 'lanes'], ['has', 'maxspeed']], ['concat', lanes, ' lanes · ', ['get', 'maxspeed']],
-            ['has', 'lanes'], ['concat', lanes, ' lanes'],
+            ['all', ['has', 'lanes'], ['has', 'maxspeed']], ['concat', lanes, ' · ', ['get', 'maxspeed']],
+            ['has', 'lanes'], lanes,
             ['get', 'maxspeed']],
         },
         paint: { 'text-color': t('tc-label'), 'text-halo-color': t('label-halo'), 'text-halo-width': 1.6 } },

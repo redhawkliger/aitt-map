@@ -47,3 +47,15 @@ describe('traffic-control layer', () => {
     expect(t.layers.find((l) => l.id === 'traffic-lanes-label').minzoom).toBeGreaterThanOrEqual(16);
   });
 });
+
+describe('traffic labels and credits', () => {
+  const tokens = fakeTokens();
+  it('a one-lane street says "1 lane", not "1 lanes"', () => {
+    const f = JSON.stringify(trafficLayer(tokens, 'night', URL_).layers.find((l) => l.id === 'traffic-lanes-label').layout['text-field']);
+    expect(f).toContain('" lane"');
+    expect(f).toContain('" lanes"');
+  });
+  it('does not repeat the OpenStreetMap credit the basemap already shows', () => {
+    expect(trafficLayer(tokens, 'night', URL_).source.attribution).toBeUndefined();
+  });
+});

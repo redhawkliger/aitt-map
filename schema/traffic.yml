@@ -6,7 +6,7 @@
 schema_name: AITT traffic control
 schema_description: Signals, stop and yield signs, crosswalks, lanes, speed limits, bike lanes and bus stops (California)
 attribution: <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>
-is_overlay: overlay
+is_overlay: true
 args:
   osm_path:
     description: Local OSM extract
