@@ -10,4 +10,4 @@ const env = { ...process.env, VITE_BASEMAP_URL: h.basemapUrl,
   VITE_PHOTOS_URLS: (h.photosUrls ?? [h.photosUrl]).join(',') };
 execSync('npx vite build', { stdio: 'inherit', env });
 execSync('npx wrangler deploy', { stdio: 'inherit', env });
-console.log('Deployed. Demo: https://aitt-map.akshaeysabha.workers.dev/demo/ (and https://map.aitransportationtools.com/demo/ once the domain is attached)');
+console.log('Deployed. Demo: https://map.aitransportationtools.com/demo/ (also https://aitt-map.akshaeysabha.workers.dev/demo/)');
