@@ -2,7 +2,7 @@ import { listLayers, setLayerVisible, setLayerOpacity, setBasemapVariant, basema
 import { VARIANTS } from '../style/build.js';
 
 const GROUP_NAMES = { basemap: 'Basemap', imagery: 'Imagery', data: 'Data' };
-const VARIANT_NAMES = { night: 'Night', day: 'Day', plan: 'Plan', neon: 'Neon' };
+const VARIANT_NAMES = { night: 'Night', day: 'Day', plan: 'Plan', neon: 'Neon', matrix: 'Matrix', ember: 'Ember', cyber: 'Cyber' };
 
 function h(tag, attrs = {}, ...kids) {
   const el = document.createElement(tag);
@@ -16,7 +16,7 @@ function h(tag, attrs = {}, ...kids) {
 }
 
 /**
- * One panel for the map: the style (Night/Day/Plan) and every registered layer, grouped, each with a switch and,
+ * One panel for the map: the style and every registered layer, grouped, each with a switch and,
  * while on, an opacity slider. Below 640 px wide it folds into a "Layers" button.
  * @param {import('maplibre-gl').Map} map
  * @param {HTMLElement} el  where the panel goes (usually a child of the map container)

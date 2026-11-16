@@ -218,3 +218,49 @@ describe('Neon theme (matches the website: black, glowing green)', () => {
     expect(buildStyle(tokens, 'day', OPTS).layers.some((l) => l.id.endsWith('_glow'))).toBe(false);
   });
 });
+
+describe('Matrix, Ember and Cyber themes', () => {
+  const tokens = fakeTokens();
+  const GLOWS = {
+    matrix: ['roads_highway_glow', 'roads_major_glow'],
+    ember: ['roads_highway_glow', 'roads_major_glow'],
+    cyber: ['roads_highway_glow', 'roads_major_glow', 'roads_minor_glow'],
+  };
+  for (const [v, glows] of Object.entries(GLOWS)) {
+    it(`${v}: is a style choice, valid, dark, 3D, with its own glow`, () => {
+      expect(VARIANTS).toContain(v);
+      const st = buildStyle(tokens, v, OPTS);
+      expect(validateStyleMin(st)).toEqual([]);
+      expect(st.sprite).toMatch(/dark$/);
+      expect(st.layers.some((l) => l.type === 'fill-extrusion')).toBe(true);
+      for (const g of glows) {
+        const l = st.layers.find((x) => x.id === g);
+        expect(l, g).toBeTruthy();
+        // Cyber's roads glow in their own traffic-light colour; the others share one glow colour.
+        const slot = v === 'cyber' ? g.replace(/^roads_(\w+)_glow$/, 'road-$1') : 'glow';
+        expect(l.paint['line-color'], g).toBe(tokens[`--map-${v}-${slot}`]);
+      }
+    });
+    it(`${v}: roads and names read clearly against the ground`, () => {
+      const t = cssTokens();
+      const k = (s) => t[`--map-${v}-${s}`];
+      expect(contrast(k('road-major'), k('earth'))).toBeGreaterThanOrEqual(3);
+      expect(contrast(k('road-minor'), k('earth'))).toBeGreaterThanOrEqual(2);
+      expect(contrast(k('label-road-major'), k('label-halo'))).toBeGreaterThanOrEqual(7);
+      expect(contrast(k('label-road'), k('label-halo'))).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+  it('cyber colours roads like a traffic light: green freeways, amber main roads, red streets', () => {
+    const t = cssTokens();
+    const hue = (hex) => {
+      const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+      const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+      const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      return (h * 60 + 360) % 360;
+    };
+    expect(hue(t['--map-cyber-road-highway'])).toBeGreaterThan(100); expect(hue(t['--map-cyber-road-highway'])).toBeLessThan(160);
+    expect(hue(t['--map-cyber-road-major'])).toBeGreaterThan(30); expect(hue(t['--map-cyber-road-major'])).toBeLessThan(55);
+    const red = hue(t['--map-cyber-road-minor']);
+    expect(red > 320 || red < 10).toBe(true);
+  });
+});

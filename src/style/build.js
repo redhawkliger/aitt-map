@@ -1,6 +1,6 @@
 import { layers, namedFlavor } from '@protomaps/basemaps';
 
-export const VARIANTS = ['night', 'day', 'plan', 'neon'];
+export const VARIANTS = ['night', 'day', 'plan', 'neon', 'matrix', 'ember', 'cyber'];
 
 // What each style adds on top of its colours. Neon (the website's look) glows harder and lights the main roads too.
 const EFFECTS = {
@@ -8,6 +8,11 @@ const EFFECTS = {
   day: { dark: false },
   plan: { dark: false },
   neon: { dark: true, threeD: true, glow: [['roads_highway', 0.55, 1.15], ['roads_major', 0.32, 0.6]] },
+  matrix: { dark: true, threeD: true, glow: [['roads_highway', 0.6, 1.2], ['roads_major', 0.38, 0.7]] },
+  ember: { dark: true, threeD: true, glow: [['roads_highway', 0.55, 1.15], ['roads_major', 0.3, 0.6]] },
+  // Cyberpunk: every road glows in its own traffic-light colour (a fourth entry names the colour slot).
+  cyber: { dark: true, threeD: true, glow: [['roads_highway', 0.6, 1.2, 'road-highway'], ['roads_major', 0.4, 0.7, 'road-major'],
+    ['roads_minor', 0.28, 0.35, 'road-minor']] },
 };
 export const FONTS = { regular: 'Overpass Regular', semibold: 'Overpass SemiBold', bold: 'Overpass Bold', italic: 'Overpass Italic' };
 export const MAP_SLOTS = [
@@ -107,7 +112,7 @@ function widerRoads(l) {
 /**
  * The MapLibre style for one variant; every colour comes from the tokens.
  * @param {Record<string,string>} tokens  from readTokens()
- * @param {'night'|'day'|'plan'|'neon'} variant
+ * @param {'night'|'day'|'plan'|'neon'|'matrix'|'ember'|'cyber'} variant
  * @param {{basemapUrl: string, glyphs?: string, sprite?: string, attribution?: string}} opts
  *        basemapUrl is the full pmtiles:// URL; glyphs and sprite must be absolute URLs.
  */
@@ -156,7 +161,7 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
     ]);
   }
   // A soft glow under the chosen roads, like light on wet asphalt (night) or neon tubes (neon).
-  for (const [id, opacity, k] of fx.glow ?? []) {
+  for (const [id, opacity, k, slot = 'glow'] of fx.glow ?? []) {
     const road = ls.find((l) => l.id === id);
     if (!road) continue;
     const glow = {
@@ -164,7 +169,7 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
       filter: road.filter, ...(road.minzoom !== undefined ? { minzoom: road.minzoom } : {}),
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
-        'line-color': t('glow'),
+        'line-color': t(slot),
         'line-width': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 3 * k, 12, 12 * k, 16, 34 * k, 20, 80 * k],
         'line-blur': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 2 * k, 12, 8 * k, 16, 24 * k, 20, 60 * k],
         'line-opacity': opacity,
