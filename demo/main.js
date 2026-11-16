@@ -51,6 +51,9 @@ if (map && pitch) map.setPitch(pitch);
 map?.on('idle', () => { window.__mapIdle = true; });
 // First idle, in ms since navigation started: the phone timing gate reads it.
 map?.once('idle', () => { window.__mapIdleAt = performance.now(); });
+// MapLibre 6 can fire its first idle while createMap is still resolving, before the lines above run; a still map
+// then never fires another. One more redraw guarantees an idle after we start listening.
+map?.triggerRepaint();
 
 // "Go to": the three test places (no search yet).
 if (map) {

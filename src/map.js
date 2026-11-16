@@ -1,4 +1,8 @@
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
+// MapLibre 6 runs its tile work in a separate worker file. The build has to ship that file and tell MapLibre where it
+// is; otherwise the built site shows controls but no map ("Worker failed to load").
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+maplibregl.setWorkerUrl(workerUrl);
 import { Protocol } from 'pmtiles';
 import { layers, namedFlavor } from '@protomaps/basemaps';
 

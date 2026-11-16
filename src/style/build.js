@@ -1,6 +1,6 @@
 import { layers, namedFlavor } from '@protomaps/basemaps';
 
-export const VARIANTS = ['night', 'day', 'plan', 'neon', 'matrix', 'ember', 'cyber', 'report', 'blocks'];
+export const VARIANTS = ['night', 'day', 'plan', 'neon', 'matrix', 'ember', 'cyber', 'report'];
 
 // What each style adds on top of its colours. Neon (the website's look) glows harder and lights the main roads too.
 const EFFECTS = {
@@ -15,8 +15,6 @@ const EFFECTS = {
     ['roads_minor', 0.28, 0.35, 'road-minor']] },
   // Report: a quiet, flat base for study figures; no shop icons.
   report: { dark: false, noPois: true },
-  // Blocks: a voxel look; square road ends and buildings stacked in whole 4 m blocks, under a blue sky.
-  blocks: { dark: false, threeD: true, blocky: true },
 };
 export const FONTS = { regular: 'Overpass Regular', semibold: 'Overpass SemiBold', bold: 'Overpass Bold', italic: 'Overpass Italic' };
 export const MAP_SLOTS = [
@@ -116,7 +114,7 @@ function widerRoads(l) {
 /**
  * The MapLibre style for one variant; every colour comes from the tokens.
  * @param {Record<string,string>} tokens  from readTokens()
- * @param {'night'|'day'|'plan'|'neon'|'matrix'|'ember'|'cyber'|'report'|'blocks'} variant
+ * @param {'night'|'day'|'plan'|'neon'|'matrix'|'ember'|'cyber'|'report'} variant
  * @param {{basemapUrl: string, glyphs?: string, sprite?: string, attribution?: string}} opts
  *        basemapUrl is the full pmtiles:// URL; glyphs and sprite must be absolute URLs.
  */
@@ -149,10 +147,6 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
   ls = variant === 'plan' || EFFECTS[variant].noPois ? ls.filter((l) => l.id !== 'pois')
     : ls.map((l) => (l.id === 'pois' ? { ...l, minzoom: Math.max(17, l.minzoom ?? 0) } : l));
   const fx = EFFECTS[variant];
-  if (fx.blocky) {
-    ls = ls.map((l) => (l.type === 'line' && l['source-layer'] === 'roads'
-      ? { ...l, layout: { ...l.layout, 'line-cap': 'butt', 'line-join': 'miter' } } : l));
-  }
   const height = ['coalesce', ['get', 'height'], 6];
   if (fx.threeD) {
     // 3D buildings from z15: flat footprints below, extruded blocks above.
@@ -163,10 +157,9 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
           // Taller is lighter, so a skyline reads at a glance.
           'fill-extrusion-color': ['interpolate', ['linear'], ['coalesce', ['get', 'height'], 6],
             0, t('building-3d'), 120, t('building-3d-top')],
-          'fill-extrusion-height': fx.blocky ? ['*', ['ceil', ['/', height, 4]], 4] : height,
-          'fill-extrusion-base': fx.blocky ? ['*', ['floor', ['/', ['coalesce', ['get', 'min_height'], 0], 4]], 4]
-            : ['coalesce', ['get', 'min_height'], 0],
-          'fill-extrusion-opacity': fx.blocky ? 1 : 0.9,
+          'fill-extrusion-height': height,
+          'fill-extrusion-base': ['coalesce', ['get', 'min_height'], 0],
+          'fill-extrusion-opacity': 0.9,
         } },
     ]);
   }

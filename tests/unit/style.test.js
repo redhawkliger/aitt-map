@@ -290,26 +290,3 @@ describe('Report style (a quiet base for study figures)', () => {
   });
 });
 
-describe('Blocks style (a blocky, voxel look)', () => {
-  const tokens = fakeTokens();
-  const st = buildStyle(tokens, 'blocks', OPTS);
-  it('is a valid style choice with a daytime sky', () => {
-    expect(VARIANTS).toContain('blocks');
-    expect(validateStyleMin(st)).toEqual([]);
-    expect(st.sprite).toMatch(/light$/);
-    expect(st.sky['sky-color']).toBe(tokens['--map-blocks-sky']);
-  });
-  it('draws roads with square ends and sharp corners', () => {
-    const roads = st.layers.filter((l) => l.type === 'line' && l['source-layer'] === 'roads');
-    expect(roads.length).toBeGreaterThan(5);
-    for (const l of roads) {
-      expect(l.layout?.['line-cap'], l.id).toBe('butt');
-      expect(l.layout?.['line-join'], l.id).toBe('miter');
-    }
-  });
-  it('stacks buildings in whole blocks (heights rounded up to 4 m steps)', () => {
-    const b = st.layers.find((l) => l.id === 'buildings_3d');
-    expect(JSON.stringify(b.paint['fill-extrusion-height'])).toContain('"ceil"');
-    expect(b.paint['fill-extrusion-opacity']).toBe(1);
-  });
-});
