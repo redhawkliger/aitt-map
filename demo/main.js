@@ -29,7 +29,7 @@ if (map) {
   useBasemap(map, styleFor, variant);
   addDataLayer(map, {
     id: 'naip', name: 'Aerial photos', group: 'imagery', visible: false,
-    source: { type: 'raster', url: 'pmtiles://' + abs(q.get('photos') ?? '/data/union-city-naip.pmtiles'), tileSize: 512,
+    source: { type: 'raster', url: 'pmtiles://' + abs(q.get('photos') ?? import.meta.env.VITE_PHOTOS_URL ?? '/data/union-city-naip.pmtiles'), tileSize: 512,
       attribution: 'Aerial photos: USDA NAIP 2022' },
     layers: [{ id: 'naip-raster', type: 'raster', source: 'naip' }],
   });

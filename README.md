@@ -24,5 +24,32 @@ The basemap tool is go-pmtiles 1.31.2 (downloaded into `bin/` on first run). Cal
 
 ## Look
 
-Night is the main style, accepted by the owner on 2026-11-15 after two rounds of polish (freeway glow, height-shaded
-3D buildings, sky and haze; bigger, brighter street names). Day and Plan exist and will get the same care later.
+Night is the main style, accepted by the owner on 2026-11-15 after polish (freeway glow, height-shaded 3D buildings,
+sky and haze; bigger, brighter street names). Then a sharpness pass the owner asked for, aiming at Google-like
+clarity: roads 1.45x wider, Night contrast raised, building outlines, clearer Day water and parks. Day and Plan exist.
+
+## Use it in a tool
+
+```sh
+npm install github:redhawkliger/aitt-map#v0.1.0
+```
+
+```js
+import 'maplibre-gl/dist/maplibre-gl.css';
+import '@aitt/map/src/theme/map-tokens.css';
+import { createMap, buildStyle, readTokens, useBasemap, addDataLayer, mountLayerPanel, mountMeasureBar, ATTRIBUTION } from '@aitt/map';
+
+const basemapUrl = 'https://tiles.aitransportationtools.com/basemap/v20261114.pmtiles'; // see hosting.json
+const glyphs = 'https://tiles.aitransportationtools.com/fonts/{fontstack}/{range}.pbf';
+const styleFor = (v) => buildStyle(readTokens(), v, { basemapUrl: 'pmtiles://' + basemapUrl, glyphs, attribution: ATTRIBUTION });
+const map = await createMap({ container, basemapUrl, style: () => styleFor('night') });
+useBasemap(map, styleFor, 'night');
+addDataLayer(map, { id: 'crashes', name: 'Crashes', group: 'data', source: {...}, layers: [...] });
+```
+
+`demo/main.js` is the full example (layer panel, measure bar, Night/Day/Plan).
+
+## Online
+
+How it's hosted for $0 (Cloudflare R2 for the map files, Pages for the demo), with the owner's click-through
+steps: [docs/HOSTING.md](docs/HOSTING.md). `npm run upload` sends the files, `npm run deploy` publishes the demo.
