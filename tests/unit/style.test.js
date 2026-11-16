@@ -95,3 +95,55 @@ describe('buildStyle', () => {
     expect(has3d('plan')).toBe(false);
   });
 });
+
+// Real token values from the CSS file, for contrast checks.
+import { readFileSync } from 'node:fs';
+function cssTokens() {
+  const css = readFileSync(new URL('../../src/theme/map-tokens.css', import.meta.url), 'utf8');
+  return Object.fromEntries([...css.matchAll(/(--map-[\w-]+)\s*:\s*(#[0-9a-fA-F]{6})/g)].map((m) => [m[1], m[2].toLowerCase()]));
+}
+function lum(hex) {
+  const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+// Value of a zoom-interpolated number at zoom z (linear stops only, which is what the labels use).
+function at(expr, z) {
+  if (typeof expr === 'number') return expr;
+  const stops = expr.slice(3);
+  for (let i = 0; i < stops.length - 2; i += 2) {
+    const [z0, v0, z1, v1] = stops.slice(i, i + 4);
+    if (z <= z0) return v0;
+    if (z <= z1) return v0 + ((v1 - v0) * (z - z0)) / (z1 - z0);
+  }
+  return stops[stops.length - 1];
+}
+
+describe('street names stand out when zoomed in', () => {
+  const tokens = fakeTokens();
+  for (const v of VARIANTS) {
+    it(`${v}: street names grow with zoom and have a solid outline`, () => {
+      const ls = buildStyle(tokens, v, OPTS).layers;
+      for (const id of ['roads_labels_minor', 'roads_labels_major']) {
+        const l = ls.find((x) => x.id === id);
+        expect(at(l.layout['text-size'], 15), `${id} z15`).toBeGreaterThanOrEqual(13);
+        expect(at(l.layout['text-size'], 18), `${id} z18`).toBeGreaterThanOrEqual(16);
+        expect(at(l.layout['text-size'], 20), `${id} z20`).toBeGreaterThanOrEqual(19);
+        expect(l.paint['text-halo-width'], id).toBeGreaterThanOrEqual(1.8);
+      }
+    });
+  }
+  it('night street names read clearly on the street they sit on', () => {
+    const t = cssTokens();
+    expect(contrast(t['--map-night-label-road'], t['--map-night-road-minor'])).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t['--map-night-label-road-major'], t['--map-night-road-major'])).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+it('street names win over shop names when they collide (drawn above, so placed first)', () => {
+  const ls = buildStyle(fakeTokens(), 'night', OPTS).layers;
+  const idx = (id) => ls.findIndex((l) => l.id === id);
+  expect(idx('roads_labels_minor')).toBeGreaterThan(idx('pois'));
+  expect(idx('roads_labels_major')).toBeGreaterThan(idx('pois'));
+});

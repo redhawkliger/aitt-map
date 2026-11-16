@@ -55,6 +55,26 @@ function swapFonts(v) {
   return v;
 }
 
+// Street names: the Protomaps default is a fixed 12 px with a 1 px halo, which disappears into the road when zoomed
+// in. Ours grow with zoom, use a heavier weight for main roads, and carry a solid outline so they lift off the line.
+const ROAD_LABEL = {
+  roads_labels_minor: { size: ['interpolate', ['linear'], ['zoom'], 15, 13, 17, 15, 18, 16.5, 20, 19.5], font: FONTS.semibold },
+  roads_labels_major: { size: ['interpolate', ['linear'], ['zoom'], 11, 12, 15, 14, 18, 17.5, 20, 21], font: FONTS.semibold },
+};
+function readableLabels(l) {
+  const road = ROAD_LABEL[l.id];
+  if (road) {
+    return { ...l,
+      layout: { ...l.layout, 'text-size': road.size, 'text-font': [road.font], 'text-letter-spacing': 0.03,
+        'symbol-spacing': 320 },
+      paint: { ...l.paint, 'text-halo-width': 2, 'text-halo-blur': 0.4 } };
+  }
+  if (l.type === 'symbol' && l.layout?.['text-field'] && l.paint?.['text-halo-width'] !== undefined) {
+    return { ...l, paint: { ...l.paint, 'text-halo-width': 1.6, 'text-halo-blur': 0.4 } };
+  }
+  return l;
+}
+
 /**
  * The MapLibre style for one variant; every colour comes from the tokens.
  * @param {Record<string,string>} tokens  from readTokens()
@@ -72,6 +92,14 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
   const origin = globalThis.location?.origin ?? 'http://localhost';
   let ls = layers('basemap', flavorFrom(t), { lang: 'en' }).map((l) =>
     l.layout?.['text-font'] ? { ...l, layout: { ...l.layout, 'text-font': swapFonts(l.layout['text-font']) } } : l);
+  ls = ls.map(readableLabels);
+  // MapLibre places symbols from the top layer down, so moving street names above the POIs lets them win a collision.
+  const streetNames = ls.filter((l) => ROAD_LABEL[l.id]);
+  const poiAt = ls.findIndex((l) => l.id === 'pois');
+  if (poiAt > -1) {
+    ls = ls.filter((l) => !ROAD_LABEL[l.id]);
+    ls.splice(ls.findIndex((l) => l.id === 'pois') + 1, 0, ...streetNames);
+  }
   // POI icons arrive pre-coloured in the sprite, so tokens can't recolour them: none on the plan sheet, and only
   // from z17 elsewhere, so a city view isn't buried in shop icons.
   ls = variant === 'plan' ? ls.filter((l) => l.id !== 'pois')
