@@ -7,8 +7,9 @@
     ".": "./src/index.js"
   },
   "files": [
-    "src",
-    "public/fonts"
+    "public/fonts",
+    "public/sprites",
+    "src"
   ],
   "scripts": {
     "dev": "vite",

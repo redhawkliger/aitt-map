@@ -1,14 +1,19 @@
 import { defineConfig } from 'vite';
 import { createReadStream, statSync, existsSync } from 'node:fs';
-import { join, normalize } from 'node:path';
+import { join, normalize, dirname, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// The project folder, whatever folder the server was started from.
+const ROOT = dirname(fileURLToPath(import.meta.url));
+const DATA = join(ROOT, 'data');
 
 // Serves data/*.pmtiles with HTTP range requests (PMTiles reads the file in pieces).
 function serveData() {
   const handler = (req, res, next) => {
     const url = decodeURIComponent((req.url ?? '').split('?')[0]);
     if (!url.startsWith('/data/')) return next();
-    const file = normalize(join(process.cwd(), url));
-    if (!file.startsWith(join(process.cwd(), 'data')) || !existsSync(file)) { res.statusCode = 404; return res.end(); }
+    const file = normalize(join(ROOT, url));
+    if (!file.startsWith(DATA + sep) || !existsSync(file)) { res.statusCode = 404; return res.end(); }
     const size = statSync(file).size;
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Content-Type', 'application/octet-stream');
