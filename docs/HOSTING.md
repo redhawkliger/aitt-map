@@ -97,3 +97,14 @@ $env:BASE_URL = "https://aitt-map.pages.dev"; npx playwright test tests/e2e/gate
 ```
 
 These are the same checks that run locally: names at every zoom at the three test places, the credit line, and the jump-to list.
+
+## Safety settings (before you share the link)
+
+- **Security headers** ship with the site in `public/_headers`: what the page may load (only our own files, our R2
+  bucket and the USGS satellite imagery), no plugins, not framable by other sites, and no camera/microphone/location
+  access. If you move the map files to a different address, add it to `connect-src` there, or the map will not load.
+- **You: budget alert.** Cloudflare dashboard → **Manage Account** → **Billing** → **Billable Usage** → set a usage
+  notification (e.g. $5). R2 is free up to 10 GB stored and 10 million reads a month; the alert tells you if a
+  scraper or a viral link pushes past that, before it costs anything real.
+- **You: upload key scope.** The R2 API token from step 3 should be "Object Read & Write" for the `aitt-map` bucket
+  only. Never paste it into a file in the repo.

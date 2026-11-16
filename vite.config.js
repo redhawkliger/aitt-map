@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { createReadStream, statSync, existsSync } from 'node:fs';
+import { createReadStream, statSync, existsSync, readFileSync } from 'node:fs';
 import { pipeline } from 'node:stream';
 import { join, normalize, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -40,8 +40,25 @@ function serveData() {
   };
 }
 
+// The local preview of the built site sends the same headers as Cloudflare Pages (public/_headers, "/*" rules only),
+// so the browser tests check the map really loads under the production security policy.
+function previewHeaders() {
+  const rules = [];
+  let inAll = false;
+  for (const line of readFileSync(join(ROOT, 'public', '_headers'), 'utf8').split(/\r?\n/)) {
+    if (!line.trim() || line.trim().startsWith('#')) continue;
+    if (!/^\s/.test(line)) { inAll = line.trim() === '/*'; continue; }
+    const i = line.indexOf(':');
+    if (inAll && i > 0) rules.push([line.slice(0, i).trim(), line.slice(i + 1).trim()]);
+  }
+  return {
+    name: 'aitt-preview-headers',
+    configurePreviewServer: (s) => { s.middlewares.use((req, res, next) => { for (const [k, v] of rules) res.setHeader(k, v); next(); }); },
+  };
+}
+
 export default defineConfig({
-  plugins: [serveData()],
+  plugins: [serveData(), previewHeaders()],
   build: { rollupOptions: { input: { demo: 'demo/index.html', sim: 'demo/sim.html' } } },
   test: { include: ['tests/unit/**/*.test.js'] },
 });
