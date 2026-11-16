@@ -264,3 +264,52 @@ describe('Matrix, Ember and Cyber themes', () => {
     expect(red > 320 || red < 10).toBe(true);
   });
 });
+
+describe('Report style (a quiet base for study figures)', () => {
+  const tokens = fakeTokens();
+  const st = buildStyle(tokens, 'report', OPTS);
+  it('is a valid light style choice', () => {
+    expect(VARIANTS).toContain('report');
+    expect(validateStyleMin(st)).toEqual([]);
+    expect(st.sprite).toMatch(/light$/);
+  });
+  it('stays flat and calm: no 3D, no glow, no shop icons', () => {
+    expect(st.layers.some((l) => l.type === 'fill-extrusion')).toBe(false);
+    expect(st.layers.some((l) => l.id.endsWith('_glow'))).toBe(false);
+    expect(st.layers.some((l) => l.id === 'pois')).toBe(false);
+  });
+  it('keeps freeways quiet so study colours stand out (low saturation)', () => {
+    const t = cssTokens();
+    const sat = (hex) => {
+      const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+      const max = Math.max(...c), min = Math.min(...c);
+      return max === 0 ? 0 : (max - min) / max;
+    };
+    for (const s of ['road-highway', 'road-major', 'road-minor', 'earth', 'building']) expect(sat(t[`--map-report-${s}`]), s).toBeLessThan(0.15);
+    expect(contrast(t['--map-report-label-road-major'], t['--map-report-label-halo'])).toBeGreaterThanOrEqual(7);
+  });
+});
+
+describe('Blocks style (a blocky, voxel look)', () => {
+  const tokens = fakeTokens();
+  const st = buildStyle(tokens, 'blocks', OPTS);
+  it('is a valid style choice with a daytime sky', () => {
+    expect(VARIANTS).toContain('blocks');
+    expect(validateStyleMin(st)).toEqual([]);
+    expect(st.sprite).toMatch(/light$/);
+    expect(st.sky['sky-color']).toBe(tokens['--map-blocks-sky']);
+  });
+  it('draws roads with square ends and sharp corners', () => {
+    const roads = st.layers.filter((l) => l.type === 'line' && l['source-layer'] === 'roads');
+    expect(roads.length).toBeGreaterThan(5);
+    for (const l of roads) {
+      expect(l.layout?.['line-cap'], l.id).toBe('butt');
+      expect(l.layout?.['line-join'], l.id).toBe('miter');
+    }
+  });
+  it('stacks buildings in whole blocks (heights rounded up to 4 m steps)', () => {
+    const b = st.layers.find((l) => l.id === 'buildings_3d');
+    expect(JSON.stringify(b.paint['fill-extrusion-height'])).toContain('"ceil"');
+    expect(b.paint['fill-extrusion-opacity']).toBe(1);
+  });
+});
