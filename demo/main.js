@@ -2,8 +2,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import '../src/theme/map-tokens.css';
 import '../src/theme/controls.css';
 import '../src/theme/panel.css';
+import '../src/theme/measure.css';
 import { createMap, buildStyle, readTokens, ATTRIBUTION, useBasemap, addDataLayer, mountLayerPanel, setLayerVisible,
-  trafficLayer, installTrafficIcons } from '../src/index.js';
+  trafficLayer, installTrafficIcons, mountMeasureBar } from '../src/index.js';
 
 const q = new URLSearchParams(location.search);
 const BASEMAP = q.get('basemap') ?? import.meta.env.VITE_BASEMAP_URL ?? '/data/california.pmtiles';
@@ -40,6 +41,11 @@ if (map) {
   const panel = document.createElement('div');
   map.getContainer().appendChild(panel);
   mountLayerPanel(map, panel);
+  const bar = document.createElement('div');
+  map.getContainer().appendChild(bar);
+  const measure = mountMeasureBar(map, bar, { colors: (v) => ({ color: tokens[`--map-${v}-measure`],
+    halo: tokens[`--map-${v}-label-halo`] }) });
+  Object.defineProperty(window, '__measure', { get: () => measure.current() });
   // ?layers=naip,... turns layers on at load (handy for links and screenshots).
   for (const id of q.get('layers')?.split(',') ?? []) setLayerVisible(map, id, true);
 }

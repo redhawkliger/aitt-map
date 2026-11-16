@@ -1,0 +1,30 @@
+/* The measure toolbar, Signal Flow. Bottom centre, dark glass on night. */
+.aitt-measure-bar {
+  position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 5;
+  display: flex; align-items: center; gap: 4px; padding: 4px;
+  font: 600 13px var(--font-body, Overpass, system-ui, sans-serif);
+  --m-bg: rgba(255, 255, 255, 0.92); --m-fg: #13181D; --m-muted: #57636F; --m-line: #D3D8DD; --m-on: #1F5FAD;
+  background: var(--m-bg); color: var(--m-fg); border: 1px solid var(--m-line); border-radius: 12px;
+  backdrop-filter: blur(10px); box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28); max-width: calc(100vw - 24px);
+}
+[data-map-variant="night"] .aitt-measure-bar {
+  --m-bg: rgba(21, 26, 31, 0.86); --m-fg: #E6EAEE; --m-muted: #8E9AA6; --m-line: #29323B; --m-on: #5AA2FF;
+}
+.aitt-measure-btn {
+  font: inherit; color: var(--m-muted); background: transparent; border: 0; border-radius: 8px;
+  padding: 7px 11px; cursor: pointer; min-height: 32px;
+}
+.aitt-measure-btn:hover { color: var(--m-fg); }
+.aitt-measure-btn[aria-pressed="true"] { color: var(--m-fg); background: var(--m-line); }
+.aitt-measure-btn:focus-visible { outline: 2px solid var(--m-on); outline-offset: 1px; }
+.aitt-measure-primary { color: #fff; background: var(--m-on); }
+[data-map-variant="night"] .aitt-measure-primary { color: #04101F; }
+.aitt-measure-btn[hidden], .aitt-measure-readout[hidden] { display: none; }
+.aitt-measure-readout {
+  padding: 0 10px; border-left: 1px solid var(--m-line); margin-left: 2px; white-space: nowrap;
+  font-variant-numeric: tabular-nums; font-size: 14px; color: var(--m-fg);
+}
+@media (max-width: 640px) {
+  .aitt-measure-bar { bottom: 34px; flex-wrap: wrap; justify-content: center; }
+  .aitt-measure-btn { padding: 9px 10px; min-height: 40px; }
+}

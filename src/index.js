@@ -5,3 +5,5 @@ export { addDataLayer, setLayerVisible, setLayerOpacity, listLayers, setBasemapV
   LayerExistsError } from './layers/registry.js';
 export { mountLayerPanel } from './layers/panel.js';
 export { trafficLayer, installTrafficIcons, TRAFFIC_ICONS } from './layers/traffic.js';
+export { distanceFt, areaSqFt, measureValue, formatMeasure } from './measure/geo.js';
+export { startMeasure, mountMeasureBar } from './measure/tool.js';
