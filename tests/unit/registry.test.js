@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addDataLayer, setLayerVisible, setLayerOpacity, listLayers, setBasemapVariant, useBasemap, LayerExistsError }
+import { addDataLayer, setLayerVisible, setLayerOpacity, setLayerFade, listLayers, setBasemapVariant, useBasemap, LayerExistsError }
   from '../../src/layers/registry.js';
 
 // A stand-in for maplibregl.Map with just the style calls the registry uses (the real map needs WebGL).
@@ -96,7 +96,7 @@ describe('layer registry', () => {
     const m = fakeMap(base('night'));
     addDataLayer(m, photos);
     expect(m.getSource('naip')).toBeUndefined();
-    expect(listLayers(m)).toEqual([{ id: 'naip', name: 'Aerial photos', group: 'imagery', visible: false, opacity: 1 }]);
+    expect(listLayers(m)).toEqual([{ id: 'naip', name: 'Aerial photos', group: 'imagery', visible: false, opacity: 1, fade: 0 }]);
     setLayerOpacity(m, 'naip', 0.5);
     setLayerVisible(m, 'naip', true);
     expect(m.getSource('naip')).toBeDefined();
@@ -134,4 +134,66 @@ describe('layer registry', () => {
   it('setBasemapVariant without a registered basemap says so', () => {
     expect(() => setBasemapVariant(fakeMap(base('night')), 'day')).toThrow(/useBasemap/);
   });
+
+  // One "Satellite" switch: statewide imagery underneath, crisp local photos on top, each from its own source.
+  const satellite = () => ({ id: 'satellite', name: 'Satellite', group: 'imagery', visible: false,
+    sources: { 'sat-usgs': { type: 'raster', tiles: ['https://x/{z}/{y}/{x}'], tileSize: 256, maxzoom: 16 },
+      'sat-bay': { type: 'raster', url: 'pmtiles://bay', tileSize: 512 } },
+    layers: [{ id: 'sat-usgs', type: 'raster', source: 'sat-usgs' }, { id: 'sat-bay', type: 'raster', source: 'sat-bay' }] });
+
+  it('one layer can draw from several sources, all added when it is first shown', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, satellite());
+    expect(m.getSource('sat-usgs')).toBeUndefined();
+    setLayerVisible(m, 'satellite', true);
+    expect(m.getSource('sat-usgs').maxzoom).toBe(16);
+    expect(m.getSource('sat-bay').url).toBe('pmtiles://bay');
+    const ids = m.getStyle().layers.map((l) => l.id);
+    expect(ids.indexOf('sat-usgs')).toBeLessThan(ids.indexOf('sat-bay'));
+    expect(ids.indexOf('sat-bay')).toBeLessThan(ids.indexOf('labels'));
+  });
+
+  it('a source id another layer already uses is refused', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, satellite());
+    const clash = { ...crashes, id: 'other', sources: { 'sat-bay': crashes.source }, source: undefined,
+      layers: [{ id: 'other-dots', type: 'circle', source: 'sat-bay' }] };
+    expect(() => addDataLayer(m, clash)).toThrow(LayerExistsError);
+  });
+
+  it('all its sources survive a style swap', () => {
+    const m = fakeMap(base('night'));
+    useBasemap(m, base, 'night');
+    addDataLayer(m, { ...satellite(), visible: true });
+    setBasemapVariant(m, 'day');
+    expect(m.getSource('sat-usgs')).toBeTruthy();
+    expect(m.getSource('sat-bay')).toBeTruthy();
+    expect(m.getLayer('sat-bay')).toBeTruthy();
+  });
+
+  it('fade lightens and softens photos for report backgrounds, and survives a style swap', () => {
+    const m = fakeMap(base('night'));
+    useBasemap(m, base, 'night');
+    addDataLayer(m, { ...satellite(), visible: true });
+    expect(listLayers(m)[0].fade).toBe(0);
+    setLayerFade(m, 'satellite', 1);
+    for (const id of ['sat-usgs', 'sat-bay']) {
+      expect(m.getPaintProperty(id, 'raster-brightness-min')).toBeGreaterThanOrEqual(0.4);
+      expect(m.getPaintProperty(id, 'raster-saturation')).toBeLessThanOrEqual(-0.5);
+    }
+    setLayerFade(m, 'satellite', 9);
+    expect(listLayers(m)[0].fade).toBe(1);
+    setBasemapVariant(m, 'day');
+    expect(m.getPaintProperty('sat-bay', 'raster-brightness-min')).toBeGreaterThanOrEqual(0.4);
+    setLayerFade(m, 'satellite', 0);
+    expect(m.getPaintProperty('sat-bay', 'raster-brightness-min')).toBe(0);
+    expect(m.getPaintProperty('sat-bay', 'raster-saturation')).toBe(0);
+  });
+
+  it('only photo layers offer fade', () => {
+    const m = fakeMap(base('night'));
+    addDataLayer(m, crashes);
+    expect('fade' in listLayers(m)[0]).toBe(false);
+  });
 });
+

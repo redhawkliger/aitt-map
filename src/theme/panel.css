@@ -32,6 +32,7 @@
 .aitt-switch:focus-visible, .aitt-seg-btn:focus-visible { outline: 2px solid var(--p-on); outline-offset: 2px; }
 
 .aitt-opacity { width: 100%; accent-color: var(--p-on); height: 16px; margin: 0; }
+.aitt-slider { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 8px; font-size: 11.5px; color: var(--p-muted); }
 
 .aitt-seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--p-line); border-radius: 8px; padding: 2px; gap: 2px; }
 .aitt-seg-btn {

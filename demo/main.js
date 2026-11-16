@@ -29,11 +29,23 @@ const map = await createMap({
 window.__map = map;
 if (map) {
   useBasemap(map, styleFor, variant);
+  // Satellite: USGS National Map imagery for all of California underneath (free, public domain, sharp to zoom 16),
+  // and our own crisp 0.6 m NAIP road-corridor files on top where we have them (transparent elsewhere).
+  // ?photos=a.pmtiles,b.pmtiles overrides the crisp files (each checked like any link address).
+  const crisp = q.has('photos')
+    ? q.get('photos').split(',').map((u) => dataUrl(u, '/data/union-city-naip.pmtiles', env))
+    : (import.meta.env.VITE_PHOTOS_URLS ?? '/data/union-city-naip.pmtiles').split(',');
   addDataLayer(map, {
-    id: 'naip', name: 'Aerial photos', group: 'imagery', visible: false,
-    source: { type: 'raster', url: 'pmtiles://' + abs(dataUrl(q.get('photos'), import.meta.env.VITE_PHOTOS_URL ?? '/data/union-city-naip.pmtiles', env)), tileSize: 512,
-      attribution: 'Aerial photos: USDA NAIP 2022' },
-    layers: [{ id: 'naip-raster', type: 'raster', source: 'naip' }],
+    id: 'satellite', name: 'Satellite', group: 'imagery', visible: false,
+    sources: {
+      'sat-usgs': { type: 'raster', tileSize: 256, maxzoom: 16,
+        tiles: ['https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}'],
+        attribution: 'Imagery: USGS The National Map, USDA NAIP' },
+      ...Object.fromEntries(crisp.map((u, i) => [`sat-crisp-${i}`, { type: 'raster', url: 'pmtiles://' + abs(u), tileSize: 512,
+        attribution: 'Aerial photos: USDA NAIP 2022' }])),
+    },
+    layers: [{ id: 'sat-usgs', type: 'raster', source: 'sat-usgs' },
+      ...crisp.map((_, i) => ({ id: `sat-crisp-${i}`, type: 'raster', source: `sat-crisp-${i}` }))],
   });
   const tokens = readTokens();
   const panel = document.createElement('div');

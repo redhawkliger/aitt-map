@@ -24,7 +24,8 @@ test('without WebGL the map says so instead of crashing', async ({ page }) => {
 });
 
 test('a missing extra layer does not take the whole map offline', async ({ page }) => {
-  await page.goto('/demo/?photos=/data/no-such-file.pmtiles&layers=naip&center=-122.0436,37.5934&zoom=15');
+  await page.route('https://basemap.nationalmap.gov/**', (r) => r.abort()); // statewide imagery unreachable too
+  await page.goto('/demo/?photos=/data/no-such-file.pmtiles&layers=satellite&center=-122.0436,37.5934&zoom=15');
   await page.waitForFunction(() => window.__mapIdle === true, null, { timeout: 30_000 });
   await page.waitForTimeout(1500);
   await expect(page.locator('.aitt-map-offline')).toHaveCount(0);

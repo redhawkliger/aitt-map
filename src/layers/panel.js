@@ -1,4 +1,4 @@
-import { listLayers, setLayerVisible, setLayerOpacity, setBasemapVariant, basemapVariant } from './registry.js';
+import { listLayers, setLayerVisible, setLayerOpacity, setLayerFade, setBasemapVariant, basemapVariant } from './registry.js';
 import { VARIANTS } from '../style/build.js';
 
 const GROUP_NAMES = { basemap: 'Basemap', imagery: 'Imagery', data: 'Data' };
@@ -31,6 +31,17 @@ export function mountLayerPanel(map, el) {
   const body = h('div', { class: 'aitt-layer-body' });
   el.replaceChildren(toggle, body);
 
+  // While a layer is on: its opacity, and for photos a fade that lightens them into a quiet report backdrop.
+  const slider = (l, key, label, value, set) => h('label', { class: 'aitt-slider' },
+    h('span', { class: 'aitt-slider-name' }, label),
+    h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(value), class: 'aitt-opacity',
+      'aria-label': `${l.name} ${label.toLowerCase()}`, 'data-focus': `${key}:${l.id}`,
+      oninput: (e) => set(map, l.id, Number(e.target.value)) }));
+  const sliders = (l) => [
+    slider(l, 'opacity', 'Opacity', l.opacity, setLayerOpacity),
+    ...(l.fade !== undefined ? [slider(l, 'fade', 'Fade for reports', l.fade, setLayerFade)] : []),
+  ];
+
   function render() {
     const kids = [];
     const variant = basemapVariant(map);
@@ -53,9 +64,7 @@ export function mountLayerPanel(map, el) {
             h('span', { class: 'aitt-layer-name' }, l.name),
             h('input', { type: 'checkbox', role: 'switch', class: 'aitt-switch', 'aria-label': l.name, checked: l.visible, 'data-focus': `switch:${l.id}`,
               onchange: (e) => setLayerVisible(map, l.id, e.target.checked) })),
-          l.visible ? h('input', { type: 'range', min: '0', max: '1', step: '0.05', value: String(l.opacity),
-            class: 'aitt-opacity', 'aria-label': `${l.name} opacity`, 'data-focus': `opacity:${l.id}`,
-            oninput: (e) => setLayerOpacity(map, l.id, Number(e.target.value)) }) : ''))));
+          ...(l.visible ? sliders(l) : [])))));
     }
     // Keep the slider being dragged: only rebuild when the set of rows or their on/off state changes.
     const key = JSON.stringify([variant, layers.map((l) => [l.id, l.visible])]);
