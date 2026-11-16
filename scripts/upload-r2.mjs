@@ -44,6 +44,32 @@ export function listPhotos(root = 'data/naip') {
   return existsSync(root) ? readdirSync(root).filter((f) => f.endsWith('.pmtiles')).sort() : [];
 }
 
+const PROMPTS = [
+  ['R2_ACCOUNT_ID', 'Cloudflare account ID', false],
+  ['R2_PUBLIC_URL', 'Bucket public address (e.g. https://tiles.aitransportationtools.com)', false],
+  ['R2_ACCESS_KEY_ID', 'R2 Access Key ID (typing is hidden)', true],
+  ['R2_SECRET_ACCESS_KEY', 'R2 Secret Access Key (typing is hidden)', true],
+];
+
+/** Read one line from the terminal; with secret, nothing typed is shown. */
+function ask(label, secret) {
+  return new Promise((resolve) => {
+    process.stdout.write(`${label}: `);
+    const stdin = process.stdin;
+    let value = '';
+    stdin.setRawMode?.(true); stdin.resume(); stdin.setEncoding('utf8');
+    const onData = (chunk) => {
+      for (const ch of chunk) {
+        if (ch === '\r' || ch === '\n') { stdin.setRawMode?.(false); stdin.pause(); stdin.off('data', onData); process.stdout.write('\n'); return resolve(value.trim()); }
+        if (ch === '\u0003') process.exit(130); // Ctrl-C
+        if (ch === '\b' || ch === '\u007f') { if (value) { value = value.slice(0, -1); if (!secret) process.stdout.write('\b \b'); } continue; }
+        value += ch; if (!secret) process.stdout.write(ch);
+      }
+    };
+    stdin.on('data', onData);
+  });
+}
+
 async function main() {
   const dry = process.argv.includes('--dry-run');
   const { build } = JSON.parse(readFileSync('data/basemap.json', 'utf8'));
@@ -53,6 +79,8 @@ async function main() {
   console.log(`${plan.length} files, ${(bytes / 1e9).toFixed(2)} GB, to r2://${BUCKET}`);
   if (dry) { for (const p of plan) console.log(`  ${p.local} -> ${p.key}`); return; }
 
+  // In a terminal, ask for anything missing; the two key values are typed hidden and never land in a command or history.
+  if (process.stdin.isTTY) for (const [k, label, secret] of PROMPTS) if (!process.env[k]) process.env[k] = await ask(label, secret);
   const need = ['R2_ACCOUNT_ID', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_PUBLIC_URL'].filter((k) => !process.env[k]);
   if (need.length) throw new Error(`Set ${need.join(', ')} first (docs/HOSTING.md, step 3)`);
   const { S3Client, HeadObjectCommand } = await import('@aws-sdk/client-s3');
