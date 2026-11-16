@@ -12,21 +12,21 @@
 }
 .maplibregl-ctrl-attrib { font: 400 11px var(--font-body, Overpass, system-ui, sans-serif); }
 
-[data-map-variant="night"] .maplibregl-ctrl-group {
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-group {
   background: rgba(21, 26, 31, 0.82) !important;          /* --surface #151A1F as glass */
   backdrop-filter: blur(8px);
   border: 1px solid #29323B;                              /* --line */
 }
-[data-map-variant="night"] .maplibregl-ctrl-group button + button { border-top: 1px solid #29323B; }
-[data-map-variant="night"] .maplibregl-ctrl-group button:hover { background: rgba(230, 234, 238, 0.08) !important; }
-[data-map-variant="night"] .maplibregl-ctrl-icon { filter: invert(0.88); }
-[data-map-variant="night"] .maplibregl-ctrl-scale {
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-group button + button { border-top: 1px solid #29323B; }
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-group button:hover { background: rgba(230, 234, 238, 0.08) !important; }
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-icon { filter: invert(0.88); }
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-scale {
   background: rgba(21, 26, 31, 0.82); color: #C2CBD3; border-color: #8E9AA6;
 }
-[data-map-variant="night"] .maplibregl-ctrl-attrib {
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-attrib {
   background: rgba(11, 14, 17, 0.7) !important; color: #8E9AA6;
 }
-[data-map-variant="night"] .maplibregl-ctrl-attrib a { color: #C2CBD3; }
+:is([data-map-variant="night"], [data-map-variant="neon"]) .maplibregl-ctrl-attrib a { color: #C2CBD3; }
 
 /* Demo "Go to" list (top centre). */
 .aitt-goto { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 5; }
@@ -35,5 +35,6 @@
   background: rgba(255, 255, 255, 0.92); color: #13181D; border: 1px solid #D3D8DD; cursor: pointer;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
 }
-[data-map-variant="night"] .aitt-goto select { background: rgba(21, 26, 31, 0.86); color: #E6EAEE; border-color: #29323B; }
+:is([data-map-variant="night"], [data-map-variant="neon"]) .aitt-goto select { background: rgba(21, 26, 31, 0.86); color: #E6EAEE; border-color: #29323B; }
 @media (max-width: 640px) { .aitt-goto { left: auto; right: 58px; transform: none; } }
+[data-map-variant="neon"] .maplibregl-ctrl-group, [data-map-variant="neon"] .aitt-goto select { background: rgba(5, 12, 9, 0.86) !important; border-color: #14402F; }

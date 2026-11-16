@@ -5,7 +5,7 @@
   --p-bg: rgba(255, 255, 255, 0.92); --p-fg: #13181D; --p-muted: #57636F; --p-line: #D3D8DD; --p-on: #1F5FAD;
   color: var(--p-fg);
 }
-[data-map-variant="night"] .aitt-layer-panel {
+:is([data-map-variant="night"], [data-map-variant="neon"]) .aitt-layer-panel {
   --p-bg: rgba(21, 26, 31, 0.84); --p-fg: #E6EAEE; --p-muted: #8E9AA6; --p-line: #29323B; --p-on: #5AA2FF;
 }
 .aitt-layer-body, .aitt-layer-toggle {
@@ -33,7 +33,7 @@
 
 .aitt-opacity { width: 100%; accent-color: var(--p-on); height: 16px; margin: 0; }
 
-.aitt-seg { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--p-line); border-radius: 8px; padding: 2px; gap: 2px; }
+.aitt-seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--p-line); border-radius: 8px; padding: 2px; gap: 2px; }
 .aitt-seg-btn {
   font: inherit; font-size: 12px; font-weight: 600; color: var(--p-muted); background: transparent;
   border: 0; border-radius: 6px; padding: 5px 0; cursor: pointer;
@@ -46,3 +46,5 @@
   .aitt-layer-body { display: none; margin-top: 6px; }
   .aitt-layer-panel.is-open .aitt-layer-body { display: grid; min-width: 220px; }
 }
+/* Neon: the website's green accent and green-tinted glass. */
+[data-map-variant="neon"] .aitt-layer-panel { --p-bg: rgba(5, 12, 9, 0.86); --p-line: #14402F; --p-on: #1EE39A; --p-muted: #6FBF9F; }

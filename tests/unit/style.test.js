@@ -191,3 +191,30 @@ describe('the map reads clearly', () => {
     expect(contrast(t['--map-day-casing'], t['--map-day-earth'])).toBeGreaterThanOrEqual(1.5);
   });
 });
+
+describe('Neon theme (matches the website: black, glowing green)', () => {
+  const tokens = fakeTokens();
+  it('is one of the style choices and makes a valid style', () => {
+    expect(VARIANTS).toContain('neon');
+    expect(validateStyleMin(buildStyle(tokens, 'neon', OPTS))).toEqual([]);
+  });
+  it('glows under freeways and main roads, from its own tokens', () => {
+    const ls = buildStyle(tokens, 'neon', OPTS).layers;
+    for (const [glow, road] of [['roads_highway_glow', 'roads_highway'], ['roads_major_glow', 'roads_major']]) {
+      const i = ls.findIndex((l) => l.id === glow);
+      expect(i, glow).toBeGreaterThan(-1);
+      expect(i).toBeLessThan(ls.findIndex((l) => l.id === road));
+      expect(ls[i].paint['line-color']).toBe(tokens['--map-neon-glow']);
+    }
+  });
+  it('has 3D buildings and a sky, and uses the dark icon sheet', () => {
+    const st = buildStyle(tokens, 'neon', OPTS);
+    expect(st.layers.some((l) => l.type === 'fill-extrusion')).toBe(true);
+    expect(st.sky['sky-color']).toBe(tokens['--map-neon-sky']);
+    expect(st.sprite).toMatch(/dark$/);
+  });
+  it('only night and neon draw main-road glow; night keeps its freeway-only glow', () => {
+    expect(buildStyle(tokens, 'night', OPTS).layers.some((l) => l.id === 'roads_major_glow')).toBe(false);
+    expect(buildStyle(tokens, 'day', OPTS).layers.some((l) => l.id.endsWith('_glow'))).toBe(false);
+  });
+});

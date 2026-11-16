@@ -1,6 +1,14 @@
 import { layers, namedFlavor } from '@protomaps/basemaps';
 
-export const VARIANTS = ['night', 'day', 'plan'];
+export const VARIANTS = ['night', 'day', 'plan', 'neon'];
+
+// What each style adds on top of its colours. Neon (the website's look) glows harder and lights the main roads too.
+const EFFECTS = {
+  night: { dark: true, threeD: true, glow: [['roads_highway', 0.28, 1]] },
+  day: { dark: false },
+  plan: { dark: false },
+  neon: { dark: true, threeD: true, glow: [['roads_highway', 0.55, 1.15], ['roads_major', 0.32, 0.6]] },
+};
 export const FONTS = { regular: 'Overpass Regular', semibold: 'Overpass SemiBold', bold: 'Overpass Bold', italic: 'Overpass Italic' };
 export const MAP_SLOTS = [
   'bg', 'earth', 'water', 'water-label', 'park', 'wood', 'scrub', 'sand', 'school', 'hospital', 'industrial',
@@ -99,7 +107,7 @@ function widerRoads(l) {
 /**
  * The MapLibre style for one variant; every colour comes from the tokens.
  * @param {Record<string,string>} tokens  from readTokens()
- * @param {'night'|'day'|'plan'} variant
+ * @param {'night'|'day'|'plan'|'neon'} variant
  * @param {{basemapUrl: string, glyphs?: string, sprite?: string, attribution?: string}} opts
  *        basemapUrl is the full pmtiles:// URL; glyphs and sprite must be absolute URLs.
  */
@@ -131,7 +139,8 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
   // from z17 elsewhere, so a city view isn't buried in shop icons.
   ls = variant === 'plan' ? ls.filter((l) => l.id !== 'pois')
     : ls.map((l) => (l.id === 'pois' ? { ...l, minzoom: Math.max(17, l.minzoom ?? 0) } : l));
-  if (variant === 'night') {
+  const fx = EFFECTS[variant];
+  if (fx.threeD) {
     // 3D buildings from z15: flat footprints below, extruded blocks above.
     ls = ls.flatMap((l) => l.id !== 'buildings' ? [l] : [
       { ...l, maxzoom: 15 },
@@ -145,30 +154,31 @@ export function buildStyle(tokens, variant, { basemapUrl, glyphs, sprite, attrib
           'fill-extrusion-opacity': 0.9,
         } },
     ]);
-    // A soft glow under the freeways, like light on wet asphalt.
-    const hw = ls.find((l) => l.id === 'roads_highway');
-    if (hw) {
-      const glow = {
-        id: 'roads_highway_glow', type: 'line', source: 'basemap', 'source-layer': hw['source-layer'],
-        filter: hw.filter, ...(hw.minzoom !== undefined ? { minzoom: hw.minzoom } : {}),
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: {
-          'line-color': t('glow'),
-          'line-width': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 3, 12, 12, 16, 34, 20, 80],
-          'line-blur': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 2, 12, 8, 16, 24, 20, 60],
-          'line-opacity': 0.28,
-        },
-      };
-      const at = ls.findIndex((l) => l.id === 'roads_highway_casing_early' || l.id === 'roads_highway');
-      ls.splice(at, 0, glow);
-    }
   }
-  const night = variant === 'night';
+  // A soft glow under the chosen roads, like light on wet asphalt (night) or neon tubes (neon).
+  for (const [id, opacity, k] of fx.glow ?? []) {
+    const road = ls.find((l) => l.id === id);
+    if (!road) continue;
+    const glow = {
+      id: `${id}_glow`, type: 'line', source: 'basemap', 'source-layer': road['source-layer'],
+      filter: road.filter, ...(road.minzoom !== undefined ? { minzoom: road.minzoom } : {}),
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': t('glow'),
+        'line-width': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 3 * k, 12, 12 * k, 16, 34 * k, 20, 80 * k],
+        'line-blur': ['interpolate', ['exponential', 1.6], ['zoom'], 6, 2 * k, 12, 8 * k, 16, 24 * k, 20, 60 * k],
+        'line-opacity': opacity,
+      },
+    };
+    const at = ls.findIndex((l) => l.id === `${id}_casing_early` || l.id === `${id}_casing` || l.id === id);
+    ls.splice(at, 0, glow);
+  }
+  const night = fx.dark;
   return {
     version: 8,
     name: `aitt-${variant}`,
     glyphs: glyphs ?? `${origin}/fonts/{fontstack}/{range}.pbf`,
-    sprite: sprite ?? `${origin}/sprites/v4/${variant === 'night' ? 'dark' : 'light'}`,
+    sprite: sprite ?? `${origin}/sprites/v4/${fx.dark ? 'dark' : 'light'}`,
     sources: { basemap: { type: 'vector', url: basemapUrl, attribution } },
     layers: ls,
     ...(night ? {

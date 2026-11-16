@@ -2,7 +2,7 @@ import { listLayers, setLayerVisible, setLayerOpacity, setBasemapVariant, basema
 import { VARIANTS } from '../style/build.js';
 
 const GROUP_NAMES = { basemap: 'Basemap', imagery: 'Imagery', data: 'Data' };
-const VARIANT_NAMES = { night: 'Night', day: 'Day', plan: 'Plan' };
+const VARIANT_NAMES = { night: 'Night', day: 'Day', plan: 'Plan', neon: 'Neon' };
 
 function h(tag, attrs = {}, ...kids) {
   const el = document.createElement(tag);
