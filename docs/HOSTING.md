@@ -57,7 +57,9 @@ The bucket was set up with the `cf` CLI. To redo it in the dashboard instead: **
       "http://localhost:5198",
       "http://localhost:5173",
       "http://localhost:4173",
-      "http://localhost:3000"
+      "http://localhost:3000",
+      "http://localhost:4311",
+      "http://localhost:4320"
     ],
     "AllowedMethods": ["GET", "HEAD"],
     "AllowedHeaders": ["Range", "If-Match"],
@@ -69,7 +71,7 @@ The bucket was set up with the `cf` CLI. To redo it in the dashboard instead: **
 
 The map reads its files in small pieces (HTTP range requests), so `Range` has to be allowed and `ETag` exposed.
 
-A new app address goes in this list and is applied with `npx wrangler r2 bucket cors set aitt-map --file <rules.json>` (wrangler's `rules[].allowed.origins` shape). `*.streetcanvas.pages.dev` covers StreetCanvas preview links; 5173/4173 = StreetCanvas dev/preview, 3000 = CrashIQ and DemandIQ dev.
+A new app address goes in this list and is applied with `npx wrangler r2 bucket cors set aitt-map --file <rules.json>` (wrangler's `rules[].allowed.origins` shape). `*.streetcanvas.pages.dev` covers StreetCanvas preview links; 5173/4173 = StreetCanvas dev/preview, 3000 = CrashIQ and DemandIQ dev, 4311/4320 = StreetCanvas owner preview/e2e.
 
 ## 3. You: upload the map files
 
